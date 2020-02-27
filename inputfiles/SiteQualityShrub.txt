@@ -1,0 +1,2 @@
+spp	c0_brolla	c_temp_brolla	c_temp2_brolla	c_precip_brolla	c_precip2_brolla	c0_maquia	c_temp_maquia	c_temp2_maquia	c_precip_maquia	c_precip2_maquia	c0_boix	c_temp_boix	c_temp2_boix	c_precip_boix	c_precip2_boix
+14	-19.23213498	0.185363746	-0.000974477	0.003186966	-0.000000292	-19.01758008	0.215043894	-0.001493817	0.002686985	-0.000000176	3.797985522	0.203610301	-0.003584762	-0.001853028	9.45E-08

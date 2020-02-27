@@ -1,0 +1,6 @@
+Factor	WindDriven	Convective	TopoDriven
+1	0.425	0.15	0.088
+2	0.325	0.375	0.525
+3	0	0	0
+4	0.212	0.475	0.387
+5	0.038	0	0
