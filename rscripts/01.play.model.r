@@ -1,6 +1,9 @@
 rm(list=ls())
-setwd("c:/work/MEDMOD/SpatialModelsR/MEDFIRE")  #Nú HP
+
+###Change to local directory###
+# setwd("c:/work/MEDMOD/SpatialModelsR/MEDFIRE")  #Nú HP
 # setwd("d:/MEDMOD/SpatialModelsR/MEDFIRE")   #CTFC
+setwd("C:/Users/uriso/Desktop/ONEKM") #Oriol laptop
 
 # set the scenario
 source("mdl/define.scenario.r")
