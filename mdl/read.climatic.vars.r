@@ -4,16 +4,31 @@
 ## Modify the extent of the input rasters to match the default extent for Catalonia
 ######################################################################################
 
+#################TO DO#####################
+#CREATE MASK OF BARCELONA
+#LOOk FOR DEFAULT EXTENT OF BARCELONA
+###########################################
+
 read.climatic.vars <- function(work.path){
   
   library(raster)
   library(tidyverse)
   
+  ##change study area
+  CAT <- T
+  BCN <- F  
+
+  if (CAT){
   ## Mask of the study area
   load("inputlyrs/rdata/mask.rdata")
-
-  ## Default extent of raster maps of Catalonia  
-  extCat <- extent(c(250000, 540000, 4480000, 4760000))
+  ## Default extent of raster maps of Catalonia 
+  extCat <- extent(c(250000, 540000, 4480000, 4760000))}
+  else if (BCN){
+  ## Mask of the study area
+  load("inputlyrs/rdata/mask_bcn.rdata")
+  MASK = MASK_BCN
+  ## Default extent of raster maps of Barcelona
+  extCat <- extent(c(250000, 540000, 4480000, 4760000))} ##CHANGE TO DEFAULT EXTENT FOR BARCELONA
   
   for(clim.scn in c("rcp45", "rcp85")){
     for(decade in seq(10,90,10)){

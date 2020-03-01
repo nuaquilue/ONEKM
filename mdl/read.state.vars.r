@@ -2,6 +2,11 @@
 ## Build land.rdata with the initialization of the state variables
 ######################################################################################3
 
+
+#################TO DO#####################
+#INCLUDE OPTION TO MASK VARIABLES WITH BARCEONA AREA
+###########################################
+
 read.state.vars <- function(work.path){
   
   library(raster)
@@ -11,10 +16,10 @@ read.state.vars <- function(work.path){
   ## Read initial state vars 
   ## When MEDFIRE will be coupled to IPM, maybe MEDFIRE do not need to track 
   ## BIOMASS and AGE state variables.
-  LCF <- raster(paste0(work.path, "/inputlyrs/asc/LCFspp10_100m.asc"))
-  BIOMASS <- raster(paste0(work.path, "/inputlyrs/asc/Biomass10.10_100m.asc"))
-  AGE <- raster("inputlyrs/asc/NewTSF_ForestAge.asc")
-  TSDIST <- raster(paste0(work.path, "/inputlyrs/asc/TSDisturb10_100m.asc"))
+  LCF <- raster(paste0(work.path, "/inputlyrs/asc/LCFspp_1km_31N-ETRS89.asc")) 
+  BIOMASS <- raster(paste0(work.path, "/inputlyrs/asc/biom1km_Oriol.asc")) ##change to updated ones
+  AGE <- raster("inputlyrs/asc/age1km_Oriol.asc") ##change to updated ones
+  TSDIST <- raster(paste0(work.path, "/inputlyrs/asc/tsdist1km_Oriol.asc")) ##change to updated ones
   
   ## Build data frame with
   ## 1. cell.id, 2. spp, 3. biomass, 4. age, 5. tsdist, 6. distype, and 7. tburnt

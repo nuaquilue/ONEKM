@@ -37,8 +37,8 @@ land.dyn.mdl <- function(scn.name){
   load("inputlyrs/rdata/mask.rdata")
   load("inputlyrs/rdata/coordinates.rdata")
   load("inputlyrs/rdata/orography.rdata")
-  load("inputlyrs/rdata/harvest.rdata")
-  load("inputlyrs/rdata/interface.rdata")
+  #load("inputlyrs/rdata/harvest.rdata")
+  #load("inputlyrs/rdata/interface.rdata")
   
   
   ## Set the directory for writing spatial outputs (create it, if it does not exist yet) 
