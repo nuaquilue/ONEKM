@@ -38,7 +38,7 @@ land.dyn.mdl <- function(scn.name){
   load("inputlyrs/rdata/coordinates.rdata")
   load("inputlyrs/rdata/orography.rdata")
   #load("inputlyrs/rdata/harvest.rdata")
-  #load("inputlyrs/rdata/interface.rdata")
+  load("inputlyrs/rdata/interface.rdata")
   
   
   ## Set the directory for writing spatial outputs (create it, if it does not exist yet) 
@@ -198,6 +198,7 @@ land.dyn.mdl <- function(scn.name){
         land$distype[land$cell.id %in% burnt.cells[!as.logical(burnt.intens)]] <- lfire
         temp.fire.schedule <- temp.fire.schedule[-1] 
         rm(fire.out)
+        save(burnt.cells, file=paste0(out.path, "/burnt_cells.rdata"))
       }
       
       

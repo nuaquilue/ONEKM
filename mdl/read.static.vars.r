@@ -36,10 +36,10 @@ read.static.vars <- function(work.path){
   orography <- data.frame(cell.id=1:ncell(MASK), elev=ELEVATION[], aspect=ASPECT[], slope=SLOPE[], road=ROAD[])
   orography <- orography[!is.na(MASK[]),]
   save(orography, file="inputlyrs/rdata/orography.rdata")
-  ## UTM layer
-  #UTM <- raster(paste0(work.path, "/inputlyrs/asc/utm1k_CatalunyaReduc_1000m_ETRS89UTM31N.asc"))
-  #utm <- data.frame(cell.id=1:ncell(UTM),  utm=UTM[])
-  #save(utm, file="inputlyrs/rdata/utm.rdata")
+  # UTM layer
+  UTM <- raster(paste0(work.path, "/inputlyrs/asc/utm1k_CatalunyaReduc_1km_ETRS89UTM31N.asc"))
+  utm <- data.frame(cell.id=1:ncell(UTM),  utm=UTM[])
+  save(utm, file="inputlyrs/rdata/utm.rdata")
   
   ## Layers for fire
   IGNI.WIND <- raster(paste0(work.path, "/inputlyrs/asc/IgniWind_1km_31N-ETRS89.asc"))
