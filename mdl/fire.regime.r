@@ -5,7 +5,8 @@
 
 fire.regime <- function(land, coord, orography, pigni, swc, clim.sever, t, 
                         burnt.cells, burnt.intens, annual.burnt=0){
-                        
+  
+  select <- dplyr::select                      
   cat(paste0("Fires in SWC: ", ifelse(swc==1, "Wind.", ifelse(swc==2, "Heat.", 
                                ifelse(swc==3, "Regular.", "Prescribed.")))))
 

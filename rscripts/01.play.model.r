@@ -7,7 +7,7 @@ setwd("C:/Users/uriso/Desktop/ONEKM") #Oriol laptop
 
 # set the scenario
 source("mdl/define.scenario.r")
-scn.name <- "TestOnekm"
+scn.name <- "Test_coupled"
 define.scenario(scn.name)
 # run the model
 source("mdl/land.dyn.mdl.r")  
