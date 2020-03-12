@@ -479,3 +479,6 @@ if(!load.workspace){
     rm(temp)
   }
 }
+adult.trees.file <- paste("./mdl_coupling/dyn_var_IPM/trees_", "BCN","_", scenario, "_","x_", n.intervals.mesh, ".rdata",sep="")
+ba.file <- paste("./mdl_coupling/dyn_var_IPM/ba_", "BCN","_", scenario, ".rdata", sep="")
+saplings.file <- paste("./mdl_coupling/dyn_var_IPM/saplings_", "BCN","_", scenario, ".rdata", sep="")

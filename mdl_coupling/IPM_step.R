@@ -3,16 +3,18 @@ IPM.step <- function(iyear){
 
   ##########definition of dyn var files#######################
   #should put this in initialisation r
-  adult.trees.file <- paste("./dyn_var/trees_", "BCN","_", scenario, "_","x_", n.intervals.mesh, ".rdata",sep="")
-  ba.file <- paste("./dyn_var/ba_", "BCN","_", scenario, ".rdata", sep="")
-  saplings.file <- paste("./dyn_var/saplings_", "BCN","_", scenario, ".rdata", sep="")
+  #adult.trees.file <- paste("./dyn_var/trees_", "BCN","_", scenario, "_","x_", n.intervals.mesh, ".rdata",sep="")
+  #ba.file <- paste("./dyn_var/ba_", "BCN","_", scenario, ".rdata", sep="")
+  #saplings.file <- paste("./dyn_var/saplings_", "BCN","_", scenario, ".rdata", sep="")
   #############################################################
   
   if (file.exists(adult.trees.file) & file.exists(ba.file) & file.exists(saplings.file)){
     load(adult.trees.file); load(ba.file); load(saplings.file) ##make sure that it updates values
+    cat("loaded dynamic varibles\n")
   }
   else{
     load(orig.adult.trees.file); load(orig.ba.file); load(orig.saplings.file)
+    cat("loaded original variables\n")
   }
   
   print(paste(date(),"- starting IPM - year",iyear,sep=" "))

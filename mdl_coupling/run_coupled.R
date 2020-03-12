@@ -2,12 +2,7 @@ IPM.Medfire.mdl <- function(scn.name){
 	source("./mdl_coupling/init_IPM.r")
 	source("./mdl_coupling/init_Medfire.r")
 	source("./mdl_coupling/Medfire_step.r")
-	source("./mdl_coupling/IPM_step.r")
-
-	adult.trees.file <- paste("./dyn_var/trees_", "BCN","_", scenario, "_","x_", n.intervals.mesh, ".rdata",sep="")
-  ba.file <- paste("./dyn_var/ba_", "BCN","_", scenario, ".rdata", sep="")
-  saplings.file <- paste("./dyn_var/saplings_", "BCN","_", scenario, ".rdata", sep="")
-
+  	source("./mdl_coupling/IPM_step.r")
 	## Start the simulations   
 	irun=1   # for testing
 	for(irun in 1:nrun){
@@ -30,7 +25,7 @@ IPM.Medfire.mdl <- function(scn.name){
 	    save(land, file="./mdl_coupling/output/land.rdata")
 	    iyear= 2000
 	    for(t in time.seq){
-	    	#IPM.step(iyear)
+	    	IPM.step(iyear)
 	    	Medfire.step(t)
 	    	burn_IPM()
 	    	iyear = iyear+1

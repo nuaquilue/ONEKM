@@ -2,7 +2,9 @@
 .Rhistory
 .RData
 .Ruserdata
+ONEKM.Rproj
 asc/
 outputs/
 IPM/
 output/
+dyn_var_IPM/

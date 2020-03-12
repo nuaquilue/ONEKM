@@ -9,6 +9,11 @@ setwd("C:/Users/uriso/Desktop/ONEKM") #Oriol laptop
 source("mdl/define.scenario.r")
 scn.name <- "Test_coupled"
 define.scenario(scn.name)
+
+#run coupled
+source("mdl_coupling/run_coupled.r")
+system.time(IPM.Medfire.mdl(scn.name))
+
 # run the model
 source("mdl/land.dyn.mdl.r")  
 system.time(land.dyn.mdl(scn.name))
