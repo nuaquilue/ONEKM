@@ -9,9 +9,42 @@
 #LOOk FOR DEFAULT EXTENT OF BARCELONA
 ###########################################
 
+adapt.climatic.vars <- function(work.path){
+  
+  ## Mask of the new study area
+  load("inputlyrs/rdata/mask_bcn.rdata")
+  MASK <- MASK_BCN
+  new.mask <- data.frame(cell.id=1:ncell(MASK), x=MASK[])
+  
+  for(clim.scn in c("rcp45", "rcp85")){
+    for(clim.mdl in c("KNMI-RACMO22E_ICHEC-EC-EARTH",
+                      "KNMI-RACMO22E_MOHC-HadGEM2-ES",
+                      "SMHI-RCA4_CNRM-CERFACS-CNRM-CM5",
+                      "SMHI-RCA4_MPI-M-MPI-ESM-LR",
+                      "SMHI-RCA4_MOHC-HadGEM2-ES")){
+      for(decade in seq(10,90,10)){ 
+        
+        print(paste("Building: scenario", clim.scn, "model", clim.mdl, "- decade", decade))
+        
+        ## Load by default clima df and save them with other names
+        load(paste0(work.path, "/inputlyrs/rdata/climate_", clim.scn, "_", clim.mdl, "_", decade, ".rdata"))
+        save(clim, file=paste0(work.path, "/inputlyrs/rdata/climate_", clim.scn, "_", clim.mdl, "_", decade, "_CAT.rdata"))
+        
+        ## Filter data for the new study area
+        clim <- left_join(clim, new.mask, by="cell.id") %>% filter(x==1) %>% select(-x)
+        
+        ## Save it
+        save(clim, file=paste0(work.path, "/inputlyrs/rdata/climate_", clim.scn, "_", clim.mdl, "_", decade, ".rdata"))
+        
+      }
+    }
+  }
+  
+}
+
+
 read.climatic.vars <- function(work.path){
   
-  library(raster)
   library(tidyverse)
   
   ##change study area
@@ -41,8 +74,6 @@ read.climatic.vars <- function(work.path){
       TEMP <- extend(TEMP, extCat)
       PRECIP <- raster(paste0(work.path, "/inputlyrs/asc/", clim.scn, "/", decade, "/plan.asc"))
       PRECIP <- extend(PRECIP, extCat)
-      RAD <- raster(paste0(work.path, "/inputlyrs/asc/", clim.scn, "/", decade, "/Radan.asc"))
-      RAD <- extend(RAD, extCat)
       
       ## Build a data frame with MASK, TEMP, PRECIP and RAD
       ## And keep only cells from CAT
