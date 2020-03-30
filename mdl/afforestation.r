@@ -39,14 +39,12 @@ afforestation <- function(land, coord, orography, clim, sdm){
   rm(neigh.sdm); gc()
   
   ## Apply the afforestation model
-  ## @urisolavila, no entenc massa que has fet aquí, x no liar-ho, només hauries de treure el factor
-  ## RADIACIÓ SOLAR (i el terme quadràtic corresponent) ja que amb les noves dades climàtiques no tenim
-  ## aquesta variable.
   oldneigh <- apply(neigh.spp, 1, count.forest)
-  z = afforest.mdl[1] + afforest.mdl[2]*clim$rad[neigh.id[,1]] + afforest.mdl[3]*(clim$rad[neigh.id[,1]])^2 +
-      afforest.mdl[4]*20 + afforest.mdl[5]*(20^2) +  afforest.mdl[6]*(orography$slope[neigh.id[,1]]/10) + 
-      afforest.mdl[7]*((orography$slope[neigh.id[,1]]/10)^2) + afforest.mdl[8]*(oldneigh/(ncol(neigh.id)-1)) +
-      afforest.mdl[9]*((oldneigh/(ncol(neigh.id)-1))^2)
+  z = afforest.mdl[1] + afforest.mdl[2]*20 + afforest.mdl[3]*(20^2) + 
+      afforest.mdl[4]*(orography$slope[neigh.id[,1]]/10) + 
+      afforest.mdl[5]*((orography$slope[neigh.id[,1]]/10)^2) + 
+      afforest.mdl[6]*(oldneigh/(ncol(neigh.id)-1)) +
+      afforest.mdl[7]*((oldneigh/(ncol(neigh.id)-1))^2)
   p = 1/(1+exp(-1*z)); p = 1-(1-p)^(1/16); rm(z)
   
   ## 
@@ -74,4 +72,3 @@ afforestation <- function(land, coord, orography, clim, sdm){
   return(new.spp)
    
 }
-
