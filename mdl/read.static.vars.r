@@ -15,7 +15,7 @@ read.static.vars <- function(work.path){
   
   library(raster)
   library(tidyverse)
-  
+  select <- dplyr::select
   cat("Reading orographyic, utm, fire regime variables", "\n")
   
   ## MASK of the study area

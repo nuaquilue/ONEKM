@@ -17,8 +17,8 @@ read.state.vars <- function(work.path){
   ## When MEDFIRE will be coupled to IPM, maybe MEDFIRE do not need to track 
   ## BIOMASS and AGE state variables.
   LCF <- raster(paste0(work.path, "/inputlyrs/asc/LCFspp_1km_31N-ETRS89.asc")) 
-  BIOMASS <- raster(paste0(work.path, "/inputlyrs/asc/biom1km_Oriol.asc")) ##change to updated ones
-  AGE <- raster("inputlyrs/asc/age1km_Oriol.asc") ##change to updated ones
+  BIOMASS <- raster(paste0(work.path, "/inputlyrs/asc/Biomass_1km_31N-ETRS89.asc")) ##change to updated ones
+  AGE <- raster("inputlyrs/asc/ForestAge_1km_31N-ETRS89.asc") ##change to updated ones
   TSDIST <- raster(paste0(work.path, "/inputlyrs/asc/tsdist1km_Oriol.asc")) ##change to updated ones
   
   ## Build data frame with

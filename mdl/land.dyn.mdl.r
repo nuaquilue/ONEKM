@@ -21,6 +21,9 @@ land.dyn.mdl <- function(scn.name){
   source("mdl/fire.regime.r")
   source("mdl/post.fire.r")
   source("mdl/auxiliars.r")
+
+  #To avoid library clashes
+  select <- dplyr::select
   
   ## Load scenario definition (global variables and scenario parameters)
   ## and customized scenario parameters

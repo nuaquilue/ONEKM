@@ -3,7 +3,7 @@
 ######################################################################################
 
 growth <- function(land, clim){
- 
+  select <- dplyr::select
   ## Tracking
   cat("Species growth", "\n")
 
@@ -37,7 +37,7 @@ growth <- function(land, clim){
   
 
 growth.10y <- function(land, clim){
-  
+  select <- dplyr::select
   ## Tracking
   cat("Species growth", "\n")
   
