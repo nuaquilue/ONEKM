@@ -5,9 +5,11 @@ update.interface <- function(land){
   
   ## UTM df
   load("inputlyrs/rdata/utm.rdata")
+  load("inputlyrs/rdata/utm_1hac.rdata")
+  load("inputlyrs/rdata/land_1hac.rdata")
   
   ## Join utm info to land
-  land.utm <- left_join(land, utm, by="cell.id") 
+  land.utm <- left_join(land_1hac, utm_1hac, by="cell.id") 
   
   ## Count each land type per utm, compute percentages
   landtype <- aggregate(list(tot=land.utm$spp>0,
@@ -59,9 +61,10 @@ update.interface <- function(land){
   interface$x <- apply(interface[,-1] * matrix(1:7, nrow=nrow(interface), ncol=7, byrow=T), 1, sum )
   
   ## Join to the final data.frame
-  land.utm <- left_join(land.utm, select(interface, utm, x), by="utm") %>% select(x)
-    # interface <- land.utm
-    # save(interface, file="inputlyrs/rdata/interface.rdata")
-  return(land.utm)
+  land.utm.1km <- left_join(land, utm, by="cell.id") 
+  land.utm.1km <- left_join(land.utm.1km, select(interface, utm, x), by="utm") %>% select(x)
+  interface <- land.utm.1km
+  save(interface, file="inputlyrs/rdata/interface.rdata")
+  return(land.utm.1km)
     
 }

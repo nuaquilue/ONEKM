@@ -58,7 +58,7 @@ define.scenario <- function(scn.name){
   growth.id <- 10; growth.step <- 1
   
   ## Time lenght (in years) of a model simulation, from 2010 to 2100
-  time.horizon <-  2
+  time.horizon <-  10
   
   ## Number of runs (i.e. replicas)
   nrun <- 1

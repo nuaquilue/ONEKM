@@ -34,9 +34,10 @@ fire.regime <- function(land, coord, orography, pigni, swc, clim.sever, t,
   
   ## Wind direction between neigbours
   ## Wind direction is coded as 0-N, 45-NE, 90-E, 135-SE, 180-S, 225-SW, 270-W, 315-NE
-  default.windir <- data.frame(x=c(0,-1,1,2900,-2900,2899,-2901,2901,-2899,-2,2,5800,-5800),
-                               windir=c(-1,270,90,180,0,225,45,135,315,270,90,180,0))
-  
+  #default.windir <- data.frame(x=c(0,-1,1,2900,-2900,2899,-2901,2901,-2899,-2,2,5800,-5800),
+  #                            windir=c(-1,270,90,180,0,225,45,135,315,270,90,180,0))
+  default.windir <- data.frame(x=c(0,-1,1,290,-290,289,-291,291,-289,-2,2,580,-580),
+                               windir=c(-1,270,90,180,0,225,315,135,45,270,90,180,0))
   
   ## Find either fixed or stochastic annual target area for wildfires
   if(swc<4){ 
@@ -149,9 +150,9 @@ fire.regime <- function(land, coord, orography, pigni, swc, clim.sever, t,
     ## Initialize tracking variables
     fire.front <- igni.id
     aburnt.lowintens <- 0
-    aburnt.highintens <- 1  # ignition always burnt, and it does in high intensity
+    aburnt.highintens <- 100  # ignition always burnt, and it does in high intensity
     if(swc==4){
-      aburnt.lowintens <- 1
+      aburnt.lowintens <- 100
       aburnt.highintens <- 0} 
     asupp.sprd <- 0
     asupp.fuel <- 0
@@ -177,7 +178,7 @@ fire.regime <- function(land, coord, orography, pigni, swc, clim.sever, t,
       neigh.id <- data.frame(cell.id=coord$cell.id[neighs$nn.idx],
                              source.id=rep(sort(fire.front), 13),
                              dist=as.numeric(neighs$nn.dists))
-      neigh.id <- filter(neigh.id, dist<=200) %>% mutate(x=cell.id-source.id) %>% 
+      neigh.id <- filter(neigh.id, dist<=2000) %>% mutate(x=cell.id-source.id) %>% #Changed it to 2000
                   left_join(default.windir, by="x") %>% select(-x) 
       neigh.id <- filter(neigh.id, cell.id %notin% visit.cells)  #before it was burnt.cells
       neigh.id
@@ -214,8 +215,13 @@ fire.regime <- function(land, coord, orography, pigni, swc, clim.sever, t,
       sprd.rate
         
       ## If at least there's a burning cell, continue, otherwise, stop
-      if(!any(sprd.rate$burning))
+      if(!any(sprd.rate$burning)){
+        cat("no_spread\n")
         break
+        }
+      else{
+        cat("spread happening\n")}
+
       
       ## Mark the cells burnt and visit, and select the new fire front
       burnt.cells <- c(burnt.cells, sprd.rate$cell.id[sprd.rate$burning])
@@ -236,8 +242,8 @@ fire.regime <- function(land, coord, orography, pigni, swc, clim.sever, t,
       
       ## Increase area burnt in either high or low intensity
       ## Prescribed burns always burnt in low intensity
-      aburnt.lowintens <- aburnt.lowintens + sum(sprd.rate$burning & sprd.rate$sr.noacc<=ifelse(swc<4,fire.intens.th,100))
-      aburnt.highintens <- aburnt.highintens + sum(sprd.rate$burning & sprd.rate$sr.noacc>ifelse(swc<4,fire.intens.th,100))
+      aburnt.lowintens <- aburnt.lowintens + (sum(sprd.rate$burning & sprd.rate$sr.noacc<=ifelse(swc<4,fire.intens.th,100)))*100 #Adapted 1km
+      aburnt.highintens <- aburnt.highintens + (sum(sprd.rate$burning & sprd.rate$sr.noacc>ifelse(swc<4,fire.intens.th,100)))*100 #Adapted 1km
       
     } # while 'fire'
     

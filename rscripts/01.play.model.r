@@ -5,14 +5,15 @@ rm(list=ls())
 # setwd("d:/MEDMOD/SpatialModelsR/MEDFIRE")   #CTFC
 setwd("C:/Users/uriso/Desktop/ONEKM") #Oriol laptop
 ## Load required packages and functions 
-#library(sp)
-#library(raster)  
-#library(RANN)  # for nn2()
-#library(tidyverse)
+library(tidyverse)
+library(sp)
+library(raster)  
+library(RANN)  # for nn2()
+
 
 # set the scenario
 source("mdl/define.scenario.r")
-scn.name <- "Test_ONEKM-v2"
+scn.name <- "ONEKM-v1"
 define.scenario(scn.name)
 
 #run coupled
