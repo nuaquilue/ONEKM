@@ -6,15 +6,12 @@
 land.dyn.mdl <- function(scn.name){
   
   ## Load required packages and functions 
-  suppressPackageStartupMessages({
-    library(sp)
-    library(raster)  
-    library(RANN)  # for nn2()
-    library(tidyverse)
-  })
+  library(sp)
+  library(raster)  
+  library(RANN)  # for nn2()
+  library(tidyverse)
   source("mdl/update.clim.r")
   source("mdl/update.interface.r")
-  source("mdl/land.cover.change.r")
   source("mdl/prob.igni.r")
   source("mdl/growth.r")
   source("mdl/drought.r")
@@ -43,7 +40,7 @@ land.dyn.mdl <- function(scn.name){
   load("inputlyrs/rdata/mask.rdata")
   load("inputlyrs/rdata/coordinates.rdata")
   load("inputlyrs/rdata/orography.rdata")
-  # load("inputlyrs/rdata/harvest.rdata")
+  #load("inputlyrs/rdata/harvest.rdata")
   load("inputlyrs/rdata/interface.rdata")
   
   
@@ -65,7 +62,7 @@ land.dyn.mdl <- function(scn.name){
   eq.ba.carbon <- read.table("inputfiles/EqBasalAreaCarbon.txt", header=T)
   
   
-  ## Climatic severity and pctg hot days tabes
+  ## Climatic severity and pctg hot days tables
   clim.severity <- read.table(paste0("inputfiles/", file.clim.severity, ".txt"), header=T)
   
   
@@ -131,39 +128,22 @@ land.dyn.mdl <- function(scn.name){
       ## Track scenario, replicate and time step
       cat(paste0("scn: ", scn.name," - run: ", irun, "/", nrun, " - time: ", t, "/", time.horizon), "\n")
       
-      # if(write.sp.outputs)
-      #   BURNT <- MASK
       if(write.sp.outputs)
-        MAP <- MASK
+        BURNT <- MASK
       
       ## 1. CLIMATE CHANGE  
       if(processes[clim.id] & t %in% temp.clim.schedule){
-        clim <- update.clim(MASK, land, orography, decade=(1+floor(t/10))*10, clim.scn, clim.mdl)
-        load(paste0("inputlyrs/rdata/sdm_", clim.scn, "_", clim.mdl, "_", (1+floor(t/10))*10, ".rdata"))
+        ## Update temp, precip, solar radiation and site quality index
+        clim <- update.clim(MASK, land, orography, decade=(1+floor(t/10))*10, clim.scn)
         temp.clim.schedule <- temp.clim.schedule[-1] 
       }
       
       
       ## 2. LAND-COVER CHANGE
+      chg.cells <- integer()
       if(processes[lchg.id] & t %in% temp.lchg.schedule){
-        # Urbanization
-        chg.cells <- land.cover.change(land, coord, interface, 1, t, numeric())
-        land$distype[land$cell.id %in% chg.cells] <- lchg.urb
-        land$spp[land$cell.id %in% chg.cells] <- 20 # urban
-        # Agriculture conversion
-        visit.cells <- chg.cells
-        chg.cells <- land.cover.change(land, coord, interface, 2, t, visit.cells)
-        land$distype[land$cell.id %in% chg.cells] <- lchg.crp
-        land$spp[land$cell.id %in% chg.cells] <- 16 # arableland or 17 - permanent crops
-        # Rural abandonment
-        visit.cells <- c(visit.cells, chg.cells)
-        chg.cells <- land.cover.change(land, coord, interface, 3, t, visit.cells)
-        land$distype[land$cell.id %in% chg.cells] <- lchg.nat
-        land$spp[land$cell.id %in% chg.cells] <- 14  # shrub
-        # Track land-cover chg
-        visit.cells <- c(visit.cells, chg.cells)
-        land$tsdist[land$cell.id %in% visit.cells] <- 0
-        # Update interface values
+        lchg.out <- land.cover.change(land, coord, orography, lc.trans=1, chg.cells)
+        # update interface values
         interface <- update.interface(land)
         temp.lchg.schedule <- temp.lchg.schedule[-1] 
       }
@@ -193,17 +173,27 @@ land.dyn.mdl <- function(scn.name){
         clim.sever <- 0
         if(runif(1,0,100) < clim.severity[clim.severity$year==t, ncol(clim.severity)]) # not-mild
           clim.sever <- 1
-        # swc = wind, heat and regular
-        for(swc in 1:3){
-          fire.out <- fire.regime(land, coord, orography, pigni, swc, clim.sever, t, 
-                                  burnt.cells, burnt.intens, annual.burnt)
-          burnt.cells <- fire.out[[1]]; burnt.intens <- fire.out[[2]]
-          if(nrow(fire.out[[3]])>0){
-            track.fire <- rbind(track.fire, data.frame(run=irun, fire.out[[3]]))
-          #test.fire(scn.name, fire.out[[4]])
-          }
-          annual.burnt <- annual.burnt+sum(fire.out[[3]]$aburnt.highintens + fire.out[[3]]$aburnt.lowintens)
-        }
+        # swc = wind
+        fire.out <- fire.regime(land, coord, orography, pigni, swc=1, clim.sever, t, 
+                                burnt.cells, burnt.intens, annual.burnt)
+        burnt.cells <- fire.out[[1]]; burnt.intens <- fire.out[[2]]
+        if(nrow(fire.out[[3]])>0)
+          track.fire <- rbind(track.fire, data.frame(run=irun, fire.out[[3]]))
+        annual.burnt <- annual.burnt+sum(fire.out[[3]]$aburnt.highintens + fire.out[[3]]$aburnt.lowintens)
+        # swc = heat
+        fire.out <- fire.regime(land, coord, orography, pigni, swc=2, clim.sever, t, 
+                                burnt.cells, burnt.intens, annual.burnt)
+        burnt.cells <- fire.out[[1]]; burnt.intens <- fire.out[[2]]
+        if(nrow(fire.out[[3]])>0)
+          track.fire <- rbind(track.fire, data.frame(run=irun, fire.out[[3]]))
+        annual.burnt <- annual.burnt+sum(fire.out[[3]]$aburnt.highintens + fire.out[[3]]$aburnt.lowintens)
+        # swc = regular
+        fire.out <- fire.regime(land, coord, orography, pigni, swc=3, clim.sever, t, 
+                                burnt.cells, burnt.intens, annual.burnt)
+        burnt.cells <- fire.out[[1]]; burnt.intens <- fire.out[[2]]
+        if(nrow(fire.out[[3]])>0)
+          track.fire <- rbind(track.fire, data.frame(run=irun, fire.out[[3]]))
+        annual.burnt <- annual.burnt+sum(fire.out[[3]]$aburnt.highintens + fire.out[[3]]$aburnt.lowintens)
         # done with fires!
         land$tsdist[land$cell.id %in% burnt.cells] <- 0
         land$tburnt[land$cell.id %in% burnt.cells] <- land$tburnt[land$cell.id %in% burnt.cells] + 1
@@ -211,6 +201,7 @@ land.dyn.mdl <- function(scn.name){
         land$distype[land$cell.id %in% burnt.cells[!as.logical(burnt.intens)]] <- lfire
         temp.fire.schedule <- temp.fire.schedule[-1] 
         rm(fire.out)
+        save(burnt.cells, file=paste0(out.path, "/burnt_cells.rdata"))
       }
       
       
@@ -281,9 +272,6 @@ land.dyn.mdl <- function(scn.name){
         aux  <- afforestation(land, coord, orography, clim, sdm)
         land$spp[land$cell.id %in% aux$cell.id] <- aux$spp
         land$biom[land$cell.id %in% aux$cell.id] <- growth.10y(aux, aux)
-        land$age[land$cell.id %in% aux$cell.id] <- 1
-        land$tsdist[land$cell.id %in% aux$cell.id] <- 1
-        land$distype[land$cell.id %in% aux$cell.id] <- 8
         clim$spp[clim$cell.id %in% aux$cell.id] <- aux$spp
         clim$sdm[clim$cell.id %in% aux$cell.id] <- 1
         clim$sqi[clim$cell.id %in% aux$cell.id] <- aux$sqi
@@ -310,25 +298,17 @@ land.dyn.mdl <- function(scn.name){
         temp.growth.schedule <- temp.growth.schedule[-1] 
       }
       
-      # Print maps every time step with ignition and low/high intenstiy burnt
+      ## Print maps every time step with ignition and low/high intenstiy burnt
+      cat("... writing output layers", "\n")
+      nfire <- sum(track.fire$year==t, na.rm=T)
+      sizes <- filter(track.fire, year==t) %>% group_by(swc, fire.id) %>% summarise(ab=aburnt.highintens+aburnt.lowintens)
+      # Ignitions' cell.id 
+      igni.id <- burnt.cells[c(1,cumsum(sizes$ab)[1:(nfire-1)]+1)] 
       if(write.sp.outputs){
-       cat("... writing output layers", "\n")
-       nfire <- sum(track.fire$year==t, na.rm=T)
-       sizes <- filter(track.fire, year==t) %>% group_by(swc, fire.id) %>% summarise(ab=aburnt.highintens+aburnt.lowintens)
-      # Ignitions' cell.id
-       igni.id <- burnt.cells[c(1,cumsum(sizes$ab)[1:(nfire-1)]+1)]
-       MAP[!is.na(MASK[])] <- land$distype*(land$tsdist==1)
-       MAP[igni.id] <- 9
-       writeRaster(MAP, paste0(out.path, "/lyr/DistType_r", irun, "t", t, ".tif"), format="GTiff", overwrite=T)
+        BURNT[!is.na(MASK[])] <- land$distype*(land$tsdist==1)
+        BURNT[igni.id] <- 9
+        writeRaster(BURNT, paste0(out.path, "/lyr/DistType_r", irun, "t", t, ".tif"), format="GTiff", overwrite=T)
       }
-      # nfire <- sum(track.fire$year==t, na.rm=T)
-      # sizes <- filter(track.fire, year==t) %>% group_by(swc, fire.id) %>% summarise(ab=aburnt.highintens+aburnt.lowintens)
-      # igni.id <- burnt.cells[c(1,cumsum(sizes$ab)[1:(nfire-1)]+1)] 
-      # if(write.sp.outputs){
-      #   BURNT[!is.na(MASK[])] <- land$distype*(land$tsdist==1)
-      #   BURNT[igni.id] <- 9
-      #   writeRaster(BURNT, paste0(out.path, "/lyr/DistType_r", irun, "t", t, ".tif"), format="GTiff", overwrite=T)
-      # }
       
       ## Deallocate memory
       gc()  

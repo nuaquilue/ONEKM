@@ -13,7 +13,7 @@ library(RANN)  # for nn2()
 
 # set the scenario
 source("mdl/define.scenario.r")
-scn.name <- "ONEKM-v1"
+scn.name <- "ONEKM-v2"
 define.scenario(scn.name)
 
 #run coupled

@@ -5,7 +5,8 @@
 update.clim <- function(MASK, land, orography, decade, clim.scn, clim.mdl){
   
   library(tidyverse)
-
+  ##To avoid library clashes
+  select <- dplyr::select
   ## Tracking
   cat("Update climate", "\n")
 

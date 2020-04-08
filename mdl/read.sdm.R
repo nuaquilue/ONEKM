@@ -12,7 +12,7 @@ read.sdm <- function(work.path, set){
   library(sp)
   library(raster)
   library(tidyverse)
-  
+  select <- dplyr::select
   ## Mask of the study area
   load(paste0(work.path, "/inputlyrs/rdata/mask.rdata"))
   
@@ -45,7 +45,7 @@ read.sdm <- function(work.path, set){
         ## Keep only cells in Catalonia, rename columns and add shrub sdm
         sdm <- filter(sdm, !is.na(mask)) %>% select(-mask) %>% mutate(sdm.shrub=1)
         ## Save it as a .rdata
-        save(sdm, file=paste0(work.path, "/inputlyrs/rdata/sdm_", set, "_", clim.scn, "_", clim.mdl, "_", decade, ".rdata"))    
+        save(sdm, file=paste0(work.path, "/inputlyrs/rdata/sdm_", clim.scn, "_", clim.mdl, "_", decade, ".rdata"))    
         
       }
     }
