@@ -98,7 +98,7 @@ read.climatic.vars2 <- function(work.path, model){
     #clim <- data.frame(cell.id=1:ncell(MASK), mask=MASK[], temp=TEMP[], precip=PRECIP[], rad=RAD[])
     clim  <-  clim[!is.na(clim$mask),]
     clim <- select(clim, cell.id, temp, precip)
-    save(clim, file=paste0("inputlyrs/rdata/climate_", clim.scn, "_", decade, ".rdata"))
+    save(clim, file=paste0("inputlyrs/rdata/climate_", clim.scn, "_", model, "_", decade, ".rdata"))
     } 
   } 
   
