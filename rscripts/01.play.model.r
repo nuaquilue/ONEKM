@@ -10,6 +10,7 @@ library(sp)
 library(raster)  
 library(RANN)  # for nn2()
 
+map.csv <- "MAP_BCN_v1.csv"
 
 # set the scenario
 source("mdl/define.scenario.r")
