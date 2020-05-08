@@ -23,12 +23,12 @@ IPM.Medfire.mdl <- function(scn.name){
 	    ## Load initial spatial dynamic state variables in a data.frame format
 	    load("inputlyrs/rdata/land.rdata")
 	    save(land, file="./mdl_coupling/output/land.rdata")
-	    iyear= 2000
+	    iyear<- 2000
 	    for(t in time.seq){
 	    	IPM.step(iyear)
 	    	Medfire.step(t)
 	    	burn_IPM()
-	    	iyear = iyear+1
+	    	iyear<- iyear+1
 
 	    }
 		## Print maps at the end of the simulation period per each run

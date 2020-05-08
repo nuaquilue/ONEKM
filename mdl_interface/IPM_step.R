@@ -16,6 +16,8 @@ IPM.step <- function(iyear){
     load(orig.adult.trees.file); load(orig.ba.file); load(orig.saplings.file)
     cat("loaded original variables\n")
   }
+
+  load(future.saplings.file); load(IPM.forest.age)
   
   print(paste(date(),"- starting IPM - year",iyear,sep=" "))
   
@@ -100,13 +102,22 @@ IPM.step <- function(iyear){
                                                      nx=nx,
                                                      y_minus_x=y.minus.x[,,j])          
             adult.trees[[j]][i,] <- dummy
-            p.sapl <- c(param.sapl1[j],param.sapl2[j])
             
-            # careful with the saplings prediction. If not controlled, it can both explode and drop below 0
-            saplings[i,j] <- ifelse(IPMSaplingsCpp(sapl[j],p.sapl)>100,100,IPMSaplingsCpp(sapl[j],p.sapl))
-            if(saplings[i,j] < 0){
-              saplings[i,j] <- 0
-            }
+            ##Calculate saplings
+            if((IPM.forest.age[i,1]+1)%%10==0){
+              if(sum(future.saplings[i,])>0){
+                saplings[i,]<- future.saplings[i,]
+                future.saplings[i,] <- 0
+              }
+              else{
+                p.sapl <- c(param.sapl1[j],param.sapl2[j])
+                # careful with the saplings prediction. If not controlled, it can both explode and drop below 0
+                saplings[i,j] <- ifelse(IPMSaplingsCpp(sapl[j],p.sapl)>100,100,IPMSaplingsCpp(sapl[j],p.sapl))
+                if(saplings[i,j] < 0){
+                  saplings[i,j] <- 0
+                }
+              }
+            } #if decade has passed
             if(ALL.RESULTS){
               ###################################################################################
               ###################################################################################
@@ -189,65 +200,70 @@ IPM.step <- function(iyear){
     
   }# for i in plots
 
+  IPM.forest.age[,1] <- IPM.forest.age[,1] + 1
   #########################################################
   #########################################################
   
   if(COLONIZATION){
-    
-    # keep a dataframe with the basal area for potential colonization
-    temp.suitable <- data.frame(ID = map$ID,
-                                saplings = integer(nrow(map)),
-                                plot_basal_area = integer(nrow(map)),
-                                #neigh = integer(nrow(map)),
-                                neigh_ba = integer(nrow(map)),
-                                suitable = logical(nrow(map)))
-    temp.suitable$plot_basal_area <- rowSums(ba) #sapply(X=trees,FUN=function(x) sum(unlist(x$ba)))
-    # default 
-    temp.suitable$suitable <- T
-    order <- sample(x = 1:NUM_SP,size = NUM_SP,replace = F)
-    for(i in order){
+      #if ((year+1)%%10 == 0){
       
-      # for every species:
-      # - select suitable plots
-      # - load regression coefficients
-      # - predict new number of saplings
-      # - append new saplings to the saplings file
-      
-      # suitable plots are these without presence,
-      # closer than 2236 to a plot with presence,
-      # with suitable land use,
-      # and total basal area lower than the specific threshold
-      
-      print(paste(date()," - ",SIM_NUMBER," - ",scenario," - year ",iyear," - colonization for sp ",i,"...",sep=""))
-      suitable <- GetSuitablePlots(map=map,
-                                   temp.suitable=temp.suitable,
-                                   adult.trees=adult.trees,
-                                   ba = ba,
-                                   #trees.index=trees.index,
-                                   distancias=distancias,
-                                   sp=tesauro[i,1],
-                                   max.dist = max.dist,
-                                   verbose=T)   
-      
-      #apply colonization
-      if(!is.null(nrow(suitable))){
-        if(nrow(suitable)>0){
-          if(i %in% conifers) my.model <- colonization.glm[[1]]
-          else if(i %in% quercus) my.model <- colonization.glm[[2]]
-          else if(i %in% deciduous) my.model <- colonization.glm[[3]]
-          
-          suitable$colonized <- predict(my.model,newdata = suitable,type = "response")
-          suitable$colonized <- ifelse(suitable$colonized > colonization.threshold,1,0)
-          
-          k <- match(suitable$ID,map$ID)
-          #add new saplings to saplings list
-          for(j in 1:nrow(suitable)){
-            # saplings[k[j],tesauro[i,1]] <- suitable$saplings[j] + saplings[k[j],tesauro[i,1]]
-            saplings[k[j],tesauro[i,1]] <- new.saplings[tesauro[i,1]] + saplings[k[j],tesauro[i,1]]
+      # keep a dataframe with the basal area for potential colonization
+      temp.suitable <- data.frame(ID = map$ID,
+                                  saplings = integer(nrow(map)),
+                                  plot_basal_area = integer(nrow(map)),
+                                  #neigh = integer(nrow(map)),
+                                  plot_age = IPM.forest.age,
+                                  neigh_ba = integer(nrow(map)),
+                                  suitable = logical(nrow(map)))
+      temp.suitable$plot_basal_area <- rowSums(ba) #sapply(X=trees,FUN=function(x) sum(unlist(x$ba)))
+      # default 
+      temp.suitable$suitable <- T
+      order <- sample(x = 1:NUM_SP,size = NUM_SP,replace = F)
+      for(i in order){
+        
+        # for every species:
+        # - select suitable plots
+        # - load regression coefficients
+        # - predict new number of saplings
+        # - append new saplings to the saplings file
+        
+        # suitable plots are these without presence,
+        # closer than 2236 to a plot with presence,
+        # with suitable land use,
+        # and total basal area lower than the specific threshold
+        # and age older than 9
+        
+        print(paste(date()," - ",SIM_NUMBER," - ",scenario," - year ",iyear," - colonization for sp ",i,"...",sep=""))
+        suitable <- GetSuitablePlots(map=map,
+                                     temp.suitable=temp.suitable,
+                                     adult.trees=adult.trees,
+                                     ba = ba,
+                                     #trees.index=trees.index,
+                                     distancias=distancias,
+                                     sp=tesauro[i,1],
+                                     max.dist = max.dist,
+                                     verbose=T)   
+        
+        #apply colonization
+        if(!is.null(nrow(suitable))){
+          if(nrow(suitable)>0){
+            if(i %in% conifers) my.model <- colonization.glm[[1]]
+            else if(i %in% quercus) my.model <- colonization.glm[[2]]
+            else if(i %in% deciduous) my.model <- colonization.glm[[3]]
+            
+            suitable$colonized <- predict(my.model,newdata = suitable,type = "response")
+            suitable$colonized <- ifelse(suitable$colonized > colonization.threshold,1,0)
+            
+            k <- match(suitable$ID,map$ID)
+            #add new saplings to saplings list
+            for(j in 1:nrow(suitable)){
+              # saplings[k[j],tesauro[i,1]] <- suitable$saplings[j] + saplings[k[j],tesauro[i,1]]
+              saplings[k[j],tesauro[i,1]] <- new.saplings[tesauro[i,1]] + saplings[k[j],tesauro[i,1]]
+            }
           }
-        }
-      }# if there are suitable plots
-    }#for sp.
+        }# if there are suitable plots
+      }#for sp.
+    #}#if decade
   }
   #########################################################
   #########################################################
@@ -280,5 +296,7 @@ IPM.step <- function(iyear){
   save(adult.trees, file=adult.trees.file)
   save(ba, file=ba.file)
   save(saplings, file=saplings.file)
-
+  save(future.saplings, file=future.saplings.file)
+  save(IPM.forest.age, file=IPM.forest.age.file)
+  rm(ba);rm(adult.trees);rm(saplings);rm(future.saplings);rm(IPM.forest.age)
 }#for iyear

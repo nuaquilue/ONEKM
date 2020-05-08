@@ -3,9 +3,9 @@
 ######################################################################################
 
 post.fire <- function(land, coord, orography, clim, sdm){
-  
+  select <- dplyr::select
   ## Tracking
-  cat("Post-fire regeneration", "\n")
+  cat("Post-fire regeneration", "\n") #; tic("  t")
   
   ## Read matrix of secondary species according to species - sqi
   ## and fire response trait per species
@@ -76,6 +76,7 @@ post.fire <- function(land, coord, orography, clim, sdm){
                                ifelse(sq.boix>=sq.brolla & sq.boix>=sq.maquia, 3, 0))) )
     new.cohort$sqi[new.cohort$spp==14] <- sqi.shrub$sqi
     
+    # toc()
     return(select(new.cohort, -temp, -precip))  
   }
   

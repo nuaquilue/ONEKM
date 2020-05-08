@@ -74,8 +74,7 @@ define.scenario <- function(scn.name){
 
   
   ## Fire parameters (should not change to much): Spread rate, burn probability, prescribed burns
-  rpb.sr <- 1.5
-  rpb.fi <- 0.5
+  rpb <- 1
   pb.upper.th <- 0.75
   pb.lower.th <- 0.05
   fire.intens.th <- 0.35  # high vs. low intensity fire, SR_noAcc <= fire.intens.th
@@ -87,14 +86,14 @@ define.scenario <- function(scn.name){
   pb.fage.th <- 30 ## minimum forest age to apply prescribed burns
   
     
-  ## Scenario parameters
-  clim.scn <- "rcp85"
+   ## Scenario parameters
+  clim.scn <- "rcp45"
   clim.mdl <- "SMHI-RCA4_MOHC-HadGEM2-ES"
   file.dmnd.lchg <- "DemandLChg"
   file.pattern.lchg  <- "PatternLChg"
-  file.dmnd.harvest <- "DemandHarvest_Bioenergy"
-  file.clim.severity <- "ClimaticSeverity_test" #paste0("ClimaticSeverity_", clim.scn, "_fixABA")
-  file.pctg.hot.days <- paste0("PctgHotDays_", clim.scn)
+  file.dmnd.harvest <- "DemandHarvest"
+  file.clim.severity <- "ClimaticSeverity"
+  file.pctg.hot.days <- "PctgHotDays_noCC"
   file.fire.suppression <- "FireSuppression_CurrExtrem"
   file.sprd.weight <- "SprdRateWeights"
     

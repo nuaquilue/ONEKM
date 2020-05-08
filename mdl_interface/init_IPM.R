@@ -5,7 +5,7 @@
 #assign("last.warning", NULL, envir = baseenv())
 ##
 
-#wd <- "C:/Users/uriso/Desktop/copia_IPM/"
+# wd <- "C:/Users/uriso/Desktop/ONEKM/"
 # wd <- getwd()
 
 # IPM functions.
@@ -103,7 +103,22 @@ if(!load.workspace){
   
   # here I trim the area to the province of BCN
   map <- subset(map, ID %in% bcn.map$ID)
-  
+
+  testing <- F
+  ##select a smaller number of cells within Barcelona
+  if (testing) {
+    orig.ba.file <- paste("../copia_IPM/initial_variables/ba_", "BCN","_R", ".rdata", sep="")
+    load(orig.ba.file)
+    ini_cells <- c()
+    NUM_PLOTS <- 1
+    i <- 1
+    while(length(ini_cells)<NUM_PLOTS){
+      if (sum(ba[i,])>0){
+        ini_cells <- c(ini_cells, i)
+      }
+      i <- i +1
+    }
+  }
   # shapefile for plotting
   # select the appropriate one depending on the area
   # either spain, catalunya, or barcelona
@@ -120,7 +135,8 @@ if(!load.workspace){
   ### we do not need to load the files in any special manner
   
   trees.sorted <- TRUE
-  
+  ##hard coded fire.regeneration, needs to be changed so it's a file
+  fire.regeneration <- c(T,T,T,F,T,F,T,F,F,F,T,T,T,T,T,T)
   if(trees.sorted){
     sp.list <- read.csv2("./IPM/lista_especies_v2.csv",header = T,stringsAsFactors = F)
     newspecies <- unique(sp.list[,3])
@@ -246,7 +262,8 @@ if(!load.workspace){
   }
   ba <- matrix(0,nrow = NUM_PLOTS,ncol = NUM_SP)
   saplings <- matrix(0,nrow = NUM_PLOTS,ncol = NUM_SP)
-  
+  future.saplings <- matrix(0,nrow = NUM_PLOTS,ncol = NUM_SP)
+  IPM.forest.age <- matrix(0,nrow = 1,ncol = NUM_SP)
   ################## ALL RESULTS
   ##################
   
@@ -479,6 +496,11 @@ if(!load.workspace){
     rm(temp)
   }
 }
-adult.trees.file <- paste("./mdl_coupling/dyn_var_IPM/trees_", "BCN","_", scenario, "_","x_", n.intervals.mesh, ".rdata",sep="")
-ba.file <- paste("./mdl_coupling/dyn_var_IPM/ba_", "BCN","_", scenario, ".rdata", sep="")
-saplings.file <- paste("./mdl_coupling/dyn_var_IPM/saplings_", "BCN","_", scenario, ".rdata", sep="")
+adult.trees.file <- paste("./mdl_interface/dyn_var_IPM/trees_", "BCN","_", scenario, "_","x_", n.intervals.mesh, ".rdata",sep="")
+ba.file <- paste("./mdl_interface/dyn_var_IPM/ba_", "BCN","_", scenario, ".rdata", sep="")
+saplings.file <- paste("./mdl_interface/dyn_var_IPM/saplings_", "BCN","_", scenario, ".rdata", sep="")
+future.saplings.file <- paste("./mdl_interface/dyn_var_IPM/future_saplings_", "BCN","_", scenario, ".rdata", sep="")
+IPM.forest.age.file <- paste("./mdl_interface/dyn_var_IPM/forest_age_", "BCN","_", scenario, ".rdata", sep="")
+save(future.saplings, file=future.saplings.file)
+save(IPM.forest.age, file=IPM.forest.age.file)
+rm(ba);rm(adult.trees);rm(saplings);rm(future.saplings);rm(IPM.forest.age)

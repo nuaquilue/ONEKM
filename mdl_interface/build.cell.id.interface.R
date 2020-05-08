@@ -9,7 +9,7 @@
 ## 2. IPM.deleted.plots: IPM plots that cannot be associate to any Medfire grid cell
 ######################################################################################################
 ## NOTES
-## This function assumes that Medfire study area is within 31N-ETRS89
+## This function assumes that Medfire projections are 31N-ETRS89 and IPM are 30N-ED50
 ######################################################################################################
 
 make.cell.ID.interface <- function(work.path, map.csv){
@@ -22,7 +22,14 @@ make.cell.ID.interface <- function(work.path, map.csv){
   
   ##Change X_UTM of IPM so they are in 31 N projection (Medfire) instead of 30 N 
   ##If  Medfire projection changes, this needs to be changed.
-  IFN.map$X_UTM=IFN.map$X_UTM-534994.66
+  #Change coordinates of IPM so they are in 31 N projection (Medfire) instead of 30 N 
+  ##If  Medfire projection changes, this needs to be changed.
+  IFN_coord<-IFN.map[,c('X_UTM', 'Y_UTM')]
+  colnames(IFN_coord)<- c("lon","lat")
+  coordinates(IFN_coord) <-c("lon","lat")
+  proj4string(IFN_coord) <- CRS("+init=epsg:23030")
+  new_coord <-spTransform(IFN_coord,CRS("+init=epsg:25831"))
+  IFN_coord_31UTM<- coordinates(new_coord)
 
   ##Creates raster file from IFN.map dataframe with Medfire rasters extension
   ##In order to associate IFN plots to same Medfire coordinates
@@ -31,7 +38,7 @@ make.cell.ID.interface <- function(work.path, map.csv){
   extent(IPM.raster)<-extent(Medfire.raster)
   res(IPM.raster)<-c(1000,1000) #1km^2
   crs(IPM.raster) <- CRS("+init=epsg:25831")
-  IPM.raster <-rasterize(IFN.map[,c('X_UTM', 'Y_UTM')], IPM.raster, 1:nrow(IFN.map))
+  IPM.raster <-rasterize(IFN_coord_31UTM, IPM.raster, 1:nrow(IFN.map))
 
   ##create cell.id.interface dataframe:
   ## | IPM.index | Medfire.id | X.Medfire | Y.Medfire | IFN.id | X.IFN | Y.IFN |
@@ -39,8 +46,8 @@ make.cell.ID.interface <- function(work.path, map.csv){
   cell.id.interface <- data.frame(IPM.index=IPM.raster[], Medfire.id=1:ncell(Medfire.raster), X.Medfire=coordinates(IPM.raster)[,1], Y.Medfire=coordinates(IPM.raster)[,2])
   cell.id.interface <-cell.id.interface[!is.na(cell.id.interface$IPM.index),]
   cell.id.interface <- cell.id.interface[order(cell.id.interface$IPM.index),]
-  cell.id.interface$X.IFN <- IFN.map$X_UTM[cell.id.interface$IPM.index]
-  cell.id.interface$Y.IFN <- IFN.map$Y_UTM[cell.id.interface$IPM.index]
+  cell.id.interface$X.IFN <- IFN_coord_31UTM[cell.id.interface$IPM.index,1]
+  cell.id.interface$Y.IFN <- IFN_coord_31UTM[cell.id.interface$IPM.index,2]
   cell.id.interface$IFN.id <- IFN.map$ID[cell.id.interface$IPM.index]
   save(cell.id.interface, file=paste0(work.path,"/mdl_interface/cell.id.interface.rdata"))
   
