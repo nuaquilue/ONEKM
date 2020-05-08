@@ -1,14 +1,12 @@
 rm(list=ls())
 
-###Change to local directory###
-# setwd("c:/work/MEDMOD/SpatialModelsR/MEDFIRE")  #Nú HP
-# setwd("d:/MEDMOD/SpatialModelsR/MEDFIRE")   #CTFC
+## Change to local directory
 setwd("C:/Users/uriso/Desktop/ONEKM") #Oriol laptop
 ## Load required packages and functions 
 library(tidyverse)
 library(sp)
 library(raster)  
-library(RANN)  # for nn2()
+library(RANN)  
 
 map.csv <- "MAP_BCN_v1.csv"
 
@@ -29,8 +27,6 @@ system.time(land.dyn.mdl(scn.name))
 source("mdl/read.static.vars.r")
 source("mdl/read.state.vars.r")
 source("mdl/read.climatic.vars.r")
-#work.path <- "C:/WORK/MEDMOD/SpatialModels/MEDFIRE_II"
-#work.path <- "C:/WORK/MEDMOD/SpatialModelsR/MEDFIRE"
 work.path <- "C:/Users/uriso/Desktop/ONEKM"
 #adapt.climatic.vars(work.path)
 # Create .Rdata with static variables of the model, only run once for all scenarios!
@@ -39,7 +35,6 @@ read.static.vars(work.path)
 read.state.vars(work.path)
 # Create a data frame per climatic scenario and decade with climatic variables (temp and precip) of a specific model for CAT 
 read.climatic.vars2(work.path, "SMHI-RCA4_MOHC-HadGEM2-ES")
-
 
 ## Save interfaces
 source("mdl/update.interface.r")

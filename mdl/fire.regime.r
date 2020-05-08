@@ -23,7 +23,7 @@ fire.regime <- function(land, coord, orography, pigni, swc, clim.sever, t,
   aba.dist <- read.table("inputfiles/AnnualBurntAreaDist.txt", header=T)
   fs.dist <- read.table("inputfiles/FireSizeDist.txt", header=T)
   fire.supp <- read.table(paste0("inputfiles/", file.fire.suppression, ".txt"), header=T)
-  spp.flammability <- read.table("inputfiles/SppSpreadRate.txt", header=T)
+  spp.flammability <- read.table("inputfiles/SppFlammability.txt", header=T)
   fst.sprd.weight <- read.table(paste0("inputfiles/", file.sprd.weight, ".txt"), header=T)
   
   
@@ -86,7 +86,7 @@ fire.regime <- function(land, coord, orography, pigni, swc, clim.sever, t,
   
   
   ## Update prob.igni according to swc
-  pigni <- mutate(pigni, psft=p*pfst.pwind[,ifelse(swc==1,1,2)+1]) %>%
+  pigni <- mutate(pigni, psft=p*pfst.pwind[,ifelse(swc==1,2,3)]) %>%
            filter(cell.id %in% subland$cell.id)
   
   

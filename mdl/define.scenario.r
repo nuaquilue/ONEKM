@@ -36,7 +36,7 @@ define.scenario <- function(scn.name){
                  TRUE,   # 4. Wildfires
                  FALSE,   # 5. Prescribed burns
                  FALSE,  # 6. Drought
-                 FALSE,   # 7. Post-fire regeneration
+                 TRUE,   # 7. Post-fire regeneration
                  FALSE,  # 8. Cohort establihsment
                  FALSE,  # 9. Afforestation
                  TRUE)   # 10. Growth

@@ -6,10 +6,8 @@ land.dyn.mdl <- function(scn.name){
   
   ## Load required packages and functions 
   suppressPackageStartupMessages({
-    library(tictoc)
-    library(sp)
     library(raster)  
-    library(RANN)  # for nn2()
+    library(RANN)  
     library(Rcpp)
     library(tidyverse)
   })
@@ -106,7 +104,6 @@ land.dyn.mdl <- function(scn.name){
   
   
   ## Start the simulations   
-  irun=1   # for testing
   for(irun in 1:nrun){
     
     ## Copy the schedulings in auxiliar vectors (only for those processes included in the current version)
