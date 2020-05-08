@@ -9,3 +9,5 @@ IPM/
 output/
 dyn_var_IPM/
 *.docx
+inputlyrs/rdata
+.gitignore
