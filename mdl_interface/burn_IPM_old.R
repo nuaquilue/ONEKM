@@ -22,17 +22,26 @@ burn.IPM <- function(){
 		load(adult.trees.file); load(ba.file); load(saplings.file); load(future.saplings.file); load(IPM.forest.age.file)
 		##Calculate future saplings
 		for (i in burnt.cells.IPM.index){
-			for(j in 1:NUM_SP){
-				if (IPM.forest.age[i,j]>9 & fire.regeneration[j] ){  #if species can regenerate
-					if (sum(ba[i,])>0){
-						## future saplings: fixed number of new.saplings times the abundance proportion of the species in the plot (in ba) 
-						future.saplings[i,j] <- new.saplings[j]*(ba[i,j]/sum(ba[i,]))
-					}
-					else{
-						future.saplings[i,j] <- new.saplings[j]*(saplings[i,j]/sum(saplings[i,]))
-					}}
-				else { future.saplings[i,j] <- 0} #species cannot regenerate
-			} #for tree species
+			##for debugging
+			if (sum(ba[i,])==0){ ##When young forest or bush are burnt
+				future.saplings[i,] <- 0	
+			}
+			else{
+				if (IPM.forest.age[i]>9){
+					for(j in 1:NUM_SP){
+						if (fire.regeneration[j]){
+							## future saplings: fixed number of new.saplings times the abundance proportion of the species in the plot (in ba) 
+							future.saplings[i,j] <- new.saplings[j]*(ba[i,j]/sum(ba[i,]))
+						} #if species can regenerate
+						else {
+							future.saplings[i,j] <- 0
+						} #species cannot regenerate
+					} #for tree species
+				} #if plot age is older than 9
+				else{
+					future.saplings[i,] <- 0
+				}
+			}#if ba plot greater than 0
 		} #for burnt IPM plot
 		
 		#Burns IPM plots by assigning adult.trees, ba and saplings to 0
