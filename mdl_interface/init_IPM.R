@@ -1,15 +1,3 @@
-
-##should I remove this and only put it in mother R?
-#rm(list=ls(all=TRUE))
-#gc()
-#assign("last.warning", NULL, envir = baseenv())
-##
-
-# wd <- "C:/Users/uriso/Desktop/ONEKM/"
-# wd <- getwd()
-
-# IPM functions.
-#setwd(wd)
 library(tidyverse)
 source("./IPM/auxiliary_functions_v9 - Roberto.R")
 source("./IPM/IPM_functions_v20_old.R")
@@ -206,15 +194,6 @@ if(!load.workspace){
   max.diam <- sapply(1:NUM_SP, function(i) max(x[,i]))
   h <- x[2,]-x[1,]
   nx <- n.intervals.mesh+1
-  
-  # This matrix is used inside the growth function to save CPU time
-  # in calculating the quadrature.
-  #### A FASTER WAY?!?!?!?!?!?
-  y.minus.x <- array(0,dim=c(dim(x)[1],dim(y)[1],NUM_SP))
-  for (k in 1:NUM_SP) {
-    for (i in 1:dim(x)[1]) for (j in 1:dim(y)[1]) y.minus.x[i,j,k] <- y[j,k] - x[i,k]
-  }
-  y.minus.x[y.minus.x<0] <- 0
   
   MAXDBH <- numeric(16)
   

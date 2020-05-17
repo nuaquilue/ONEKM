@@ -9,7 +9,7 @@
 ## 2. IPM.deleted.plots: IPM plots that cannot be associate to any Medfire grid cell
 ######################################################################################################
 ## NOTES
-## This function assumes that Medfire projections are 31N-ETRS89 and IPM are 30N-ED50
+## This function assumes that Medfire projections are in  31N-ETRS89 and IPM are in 30N-ED50
 ######################################################################################################
 
 make.cell.ID.interface <- function(work.path, map.csv){
@@ -46,7 +46,7 @@ make.cell.ID.interface <- function(work.path, map.csv){
   cell.id.interface <- data.frame(IPM.index=IPM.raster[], Medfire.id=1:ncell(Medfire.raster), X.Medfire=coordinates(IPM.raster)[,1], Y.Medfire=coordinates(IPM.raster)[,2])
   cell.id.interface <-cell.id.interface[!is.na(cell.id.interface$IPM.index),]
   cell.id.interface <- cell.id.interface[order(cell.id.interface$IPM.index),]
-  cell.id.interface$X.IFN <- IFN_coord_31UTM[cell.id.interface$IPM.index,1]
+  cell.id.interface$X.IFN <- IFN_coord_31UTM[cell.id.interface$IPM.indexIPM.index,1]
   cell.id.interface$Y.IFN <- IFN_coord_31UTM[cell.id.interface$IPM.index,2]
   cell.id.interface$IFN.id <- IFN.map$ID[cell.id.interface$IPM.index]
   save(cell.id.interface, file=paste0(work.path,"/mdl_interface/cell.id.interface.rdata"))
