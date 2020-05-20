@@ -10,7 +10,11 @@ land.dyn.mdl <- function(scn.name){
     library(RANN)  
     library(Rcpp)
     library(tidyverse)
+    library(ff) ## IPM
   })
+  options(fftempdir = "./")
+
+  ##Medfire functions
   source("mdl/update.clim.r")
   source("mdl/update.interface.r")
   source("mdl/land.cover.change.r")
@@ -24,6 +28,15 @@ land.dyn.mdl <- function(scn.name){
   source("mdl/post.fire.r")
   source("mdl/auxiliars.r")
   sourceCpp("mdl/is.in.cpp")
+
+  ##IPM functions
+  source("./IPM/auxiliary_functions_v9 - Roberto.R")
+  source("./IPM/IPM_functions_v20_old.R")
+  source("./mdl_interface/build.var.IPM.r")
+  source("./mdl_interface/read_IPM_age.r")
+  sourceCpp("./IPM/IPM_functions_v21_1_Year.cpp")
+
+
   
   ##To avoid library clashes
   select <- dplyr::select
@@ -34,8 +47,27 @@ land.dyn.mdl <- function(scn.name){
   if(file.exists(paste0("outputs/", scn.name, "/scn.custom.def.r")))
     source(paste0("outputs/", scn.name, "/scn.custom.def.r"))
   
-  
-  ## Load:
+  ##IPM global variables and parameters
+  source(paste0("mdl_interface/IPM_parameters.r"))
+
+  ## Load IPM dynamic variables
+  if (file.exists(orig.adult.trees.file) & file.exists(orig.ba.file) & file.exists(orig.saplings.file)){
+	  load(orig.adult.trees.file); load(orig.ba.file); load(orig.saplings.file) 
+	  cat("IPM initial variables loaded\n")
+  } else{
+  	  build.var.IPM()
+  	  load(orig.adult.trees.file); load(orig.ba.file); load(orig.saplings.file) 
+      cat("IPM initial variables loaded\n")
+  }
+  if (file.exists(orig.plots.age.file)){
+  	load(orig.plots.age.file) ## to do
+  } else{
+  	read_IPM_age(clim.scn, clim.mdl)
+  	load(orig.plots.age.file)
+  }
+
+
+  ## Load Medfire variables:
   ## 1. Mask of the study area (raster)
   ## 2. Data frame with cell.id and coordinates x, y
   ## 3. Data frame of the model static variables 
@@ -58,6 +90,8 @@ land.dyn.mdl <- function(scn.name){
   species <- c("phalepensis", "pnigra", "ppinea", "psylvestris", "ppinaster", "puncinata",
                "aalba", "qilex", "qsuber", "qfaginea", "qhumilis", "fsylvatica", "other")
                   
+  Medfire.index.IPM.spp<-c(5,6,8,9,7,10,2,12,15,11,11,3) #quercus humilis and faginea are classified as the same for IPM
+  IPM.index.Medfire.spp <-c(13,13,12,13,1,2,5,3,4,6,11,8,13,13,9,13) #classified as other (13): coniferes(1), decideous(2), juniperus(4), quercus pyrenaica(13), quercus robur(14) and 	Sclerophyllous (16)
   
   ## Translation equations from Basal Area to Volum, Volum with bark and Carbon
   eq.ba.vol <- read.table("inputfiles/EqBasalAreaVol.txt", header=T)
@@ -117,6 +151,76 @@ land.dyn.mdl <- function(scn.name){
     temp.cohort.schedule <- cohort.schedule
     temp.afforest.schedule <- afforest.schedule
     temp.growth.schedule <- growth.schedule
+
+    if(ALL.RESULTS){
+      results <- list()
+      for(i in 1:NUM_SP){
+        results[[i]] <- data.frame(ID = integer(nrow(map)),
+                                   adults_2000 = integer(nrow(map)),
+                                   deaths_2000 = integer(nrow(map)),
+                                   new_adults_2000 = integer(nrow(map)),
+                                   saplings_2000 = integer(nrow(map)),
+                                   basal_area_2000 = numeric(nrow(map)),
+                                   #
+                                   adults_2010 = integer(nrow(map)),
+                                   deaths_2010 = integer(nrow(map)),
+                                   new_adults_2010 = integer(nrow(map)),
+                                   saplings_2010 = integer(nrow(map)),
+                                   basal_area_2010 = numeric(nrow(map)),
+                                   #
+                                   adults_2020 = integer(nrow(map)),
+                                   deaths_2020 = integer(nrow(map)),
+                                   new_adults_2020 = integer(nrow(map)),
+                                   saplings_2020 = integer(nrow(map)),
+                                   basal_area_2020 = numeric(nrow(map)),
+                                   #
+                                   adults_2030 = integer(nrow(map)),
+                                   deaths_2030 = integer(nrow(map)),
+                                   new_adults_2030 = integer(nrow(map)),
+                                   saplings_2030 = integer(nrow(map)),
+                                   basal_area_2030 = numeric(nrow(map)),
+                                   #
+                                   adults_2040 = integer(nrow(map)),
+                                   deaths_2040 = integer(nrow(map)),
+                                   new_adults_2040 = integer(nrow(map)),
+                                   saplings_2040 = integer(nrow(map)),
+                                   basal_area_2040 = numeric(nrow(map)),
+                                   #
+                                   adults_2050 = integer(nrow(map)),
+                                   deaths_2050 = integer(nrow(map)),
+                                   new_adults_2050 = integer(nrow(map)),
+                                   saplings_2050 = integer(nrow(map)),
+                                   basal_area_2050 = numeric(nrow(map)),
+                                   #
+                                   adults_2060 = integer(nrow(map)),
+                                   deaths_2060 = integer(nrow(map)),
+                                   new_adults_2060 = integer(nrow(map)),
+                                   saplings_2060 = integer(nrow(map)),
+                                   basal_area_2060 = numeric(nrow(map)),
+                                   #
+                                   adults_2070 = integer(nrow(map)),
+                                   deaths_2070 = integer(nrow(map)),
+                                   new_adults_2070 = integer(nrow(map)),
+                                   saplings_2070 = integer(nrow(map)),
+                                   basal_area_2070 = numeric(nrow(map)),
+                                   #
+                                   adults_2080 = integer(nrow(map)),
+                                   deaths_2080 = integer(nrow(map)),
+                                   new_adults_2080 = integer(nrow(map)),
+                                   saplings_2080 = integer(nrow(map)),
+                                   basal_area_2080 = numeric(nrow(map)),
+                                   #  
+                                   adults_2090 = integer(nrow(map)),
+                                   deaths_2090 = integer(nrow(map)),
+                                   new_adults_2090 = integer(nrow(map)),
+                                   saplings_2090 = integer(nrow(map)),
+                                   basal_area_2090 = numeric(nrow(map)),
+                                   #
+                                   temperature = numeric(nrow(map)),
+                                   precipitation = numeric(nrow(map)))
+        results[[i]]$ID <- map$ID
+      }
+    }# if ALL.RESULTS
     
     
     ## Load initial spatial dynamic state variables in a data.frame format
@@ -291,7 +395,7 @@ land.dyn.mdl <- function(scn.name){
       if(MEDFIRE){
         if(IPM){#IPM only happens if Medfire
           ##IPM plots burnt by medfire
-          burnt.cells.IPM.index <- cell.id.interface$IPM.index[cell.id.interface$Medfire.id %in% burnt.cells]
+          burnt.cells.IPM.index <- which(map$Medfire.id %in% burnt.cells) #cell.id.interface$IPM.index[cell.id.interface$Medfire.id %in% burnt.cells]
           if(length(burnt.cells.IPM.index)!=0){
             #load(adult.trees.file); load(ba.file); load(saplings.file); load(future.saplings.file); load(IPM.forest.age.file)
             ##Calculate future saplings
@@ -322,10 +426,6 @@ land.dyn.mdl <- function(scn.name){
         }
         ##MEDFIRE
         if(processes[post.fire.id] & t %in% temp.post.fire.schedule){
-          if (IPM.post.fire){
-
-          }
-          else{
             ## forest transition of tree species burnt in high intensity
             aux  <- post.fire(land, coord, orography, clim, sdm)
             if(nrow(aux)>0){
@@ -338,9 +438,28 @@ land.dyn.mdl <- function(scn.name){
             }
             rm(aux) 
             temp.post.fire.schedule <- temp.post.fire.schedule[-1] 
-          }
-        }
-      }
+        	if(IPM.post.fire){
+        		## LCT is updated yearly for cell that have been burnt at least once
+        		IPM.burnt.plots.indexes <- which(map$Medfire.id %in% land[land$tburnt>0,cell.id])
+        		for (burnt.plot in IPM.burnt.plots.indexes) {
+        			if (sum(ba[burnt.plot,])>0){
+        				IPM.spp <- which.max(ba[burnt.plot,])
+        				Medfire.spp <- IPM.index.Medfire.spp[IPM.spp]
+        				land$spp[land$cell.id %in%  map$Medfire.id[burnt.plot]] <- Medfire.spp
+        				clim$spp[clim$cell.id %in%  map$Medfire.id[burnt.plot]] <- Medfire.spp
+        			} else if(sum(saplings[burnt.plot,])>0){
+        				IPM.spp <- which.max(saplings[burnt.plot,])
+        				Medfire.spp <- IPM.index.Medfire.spp[IPM.spp]
+        				land$spp[land$cell.id %in%  map$Medfire.id[burnt.plot]] <- Medfire.spp
+        				clim$spp[clim$cell.id %in%  map$Medfire.id[burnt.plot]] <- Medfire.spp
+        			} else{
+        				land$spp[land$cell.id %in%  map$Medfire.id[burnt.plot]] <- 14 #shrub
+        				clim$spp[clim$cell.id %in%  map$Medfire.id[burnt.plot]] <- 14 #shrub
+        			}
+        		}#for burnt plot
+        	}#if IPM.post.fire
+        }#if process
+      }#if Medfire
       
 
       ## 8. COHORT ESTABLISHMENT
@@ -361,6 +480,21 @@ land.dyn.mdl <- function(scn.name){
       
 
       ## 9. AFFORESTATION
+      if(MEDFIRE){
+        if(processes[afforest.id] & t %in% temp.afforest.schedule){
+            aux  <- afforestation(land, coord, orography, clim, sdm)
+            land$spp[land$cell.id %in% aux$cell.id] <- aux$spp
+            land$age[land$cell.id %in% aux$cell.id] <- 0
+            land$tsdist[land$cell.id %in% aux$cell.id] <- 0
+            land$distype[land$cell.id %in% aux$cell.id] <- afforest
+            clim$spp[clim$cell.id %in% aux$cell.id] <- aux$spp
+            clim$sdm[clim$cell.id %in% aux$cell.id] <- 1
+            clim$sqi[clim$cell.id %in% aux$cell.id] <- aux$sqi
+            track.afforest <- rbind(track.afforest, data.frame(run=irun, year=t, table(aux$spp)))
+            temp.afforest.schedule <- temp.afforest.schedule[-1] 
+        }
+      }
+
       if(IPM) {
         if(COLONIZATION){
           # keep a dataframe with the basal area for potential colonization
@@ -374,58 +508,80 @@ land.dyn.mdl <- function(scn.name){
           temp.suitable$plot_basal_area <- rowSums(ba) #sapply(X=trees,FUN=function(x) sum(unlist(x$ba)))
           # default 
           temp.suitable$suitable <- T
+          colonized.plots.ID <- c()
           order <- sample(x = 1:NUM_SP,size = NUM_SP,replace = F)
           for(i in order){            
-            
-            print(paste(date()," - ",SIM_NUMBER," - ",scenario," - year ",iyear," - colonization for sp ",i,"...",sep=""))
-            
+            print(paste(date()," - ",scn.name," - ",clim.scn," - year ",iyear," - colonization for sp ",i,"...",sep=""))
             temp.suitable$sp_age <- IPM.forest.age[,i]
             suitable <- GetSuitablePlots(map=map, temp.suitable=temp.suitable, ba = ba, distancias=distancias, sp=tesauro[i,1],
                                           max.dist = max.dist, verbose=T)   
             ##apply colonization
             if(!is.null(nrow(suitable))){
               if(nrow(suitable)>0){
+              	if (MEDFIRE){
+              		##Only suitable if it has been colonized by Medfire as well
+              		if (processes[afforest.id]){
+              			colonized.medfire <- which(map$Medfire.id %in% aux$cell.id)
+              			suitable <- suitable[suitable$ID %in% map$ID[colonized.medfire],]
+              		}
+              	} ##if Medfire
                 if(i %in% conifers) my.model <- colonization.glm[[1]]
                 else if(i %in% quercus) my.model <- colonization.glm[[2]]
                 else if(i %in% deciduous) my.model <- colonization.glm[[3]]
-                
                 suitable$colonized <- predict(my.model,newdata = suitable,type = "response")
                 suitable$colonized <- ifelse(suitable$colonized > colonization.threshold,1,0)
-                
-                k <- match(suitable$ID,map$ID)
-                #add new saplings to saplings list
-                for(j in 1:nrow(suitable)){
-                  # saplings[k[j],tesauro[i,1]] <- suitable$saplings[j] + saplings[k[j],tesauro[i,1]]
-                  saplings[k[j],tesauro[i,1]] <- new.saplings[tesauro[i,1]] #+ saplings[k[j],tesauro[i,1]]
-                  #IPM.forest.age[k[j], tesauro[i,1] ]<-IPM.forest.age[k[j], tesauro[i,1]]+1 Not necessary since it is updated later
-                }
+                if (nrow(suitable)>0){
+	                k <- match(suitable$ID,map$ID)
+	                colonized.plots.ID <- c(colonized.plots.ID, map$ID[k])
+	                #add new saplings to saplings list
+	                for(j in 1:nrow(suitable)){
+	                  saplings[k[j],tesauro[i,1]] <- new.saplings[tesauro[i,1]] 
+	                }
+            	}
               }
             }# if there are suitable plots
-          }#for sp.
+          }#for each species
+          ##colonize plots colonized in Medfire but not in IPM
+          colonized.plots.ID <- unique(colonized.plots.ID)
+          if (MEDFIRE){
+            if (processes[afforest.id]){
+      			to.colonize.ID <- colonized.plots.ID[!(colonized.plots.ID %in% map$ID[colonized.medfire])] 
+      			if(length(to.colonize.ID)>0){
+      				k <- match(to.colonize.ID,map$ID)
+      				for(j in to.colonize.ID){
+      					spp.Medfire <- land$spp[land$cell.id==map$Medfire.id[k[j]]
+      					spp.IPM <- Medfire.index.IPM.spp[spp.Medfire]
+      					saplings[k[j], spp.IPM] <- new.saplings[spp.IPM]
+      				}
+      			}
+      		}
+          } ## if Medfire
         }#if colonization module is active
       }#if IPM
 
+      ## Track colonized plots LCT evolution of all the cells that have IPM plots
       if(MEDFIRE){
-        if(processes[afforest.id] & t %in% temp.afforest.schedule){
-          if(IPM.afforestation){
-
-          }
-          else{
-            aux  <- afforestation(land, coord, orography, clim, sdm)
-            land$spp[land$cell.id %in% aux$cell.id] <- aux$spp
-            land$age[land$cell.id %in% aux$cell.id] <- 0
-            land$tsdist[land$cell.id %in% aux$cell.id] <- 0
-            land$distype[land$cell.id %in% aux$cell.id] <- afforest
-            clim$spp[clim$cell.id %in% aux$cell.id] <- aux$spp
-            clim$sdm[clim$cell.id %in% aux$cell.id] <- 1
-            clim$sqi[clim$cell.id %in% aux$cell.id] <- aux$sqi
-            track.afforest <- rbind(track.afforest, data.frame(run=irun, year=t, table(aux$spp)))
-            temp.afforest.schedule <- temp.afforest.schedule[-1] 
-          }
-        }
-      }
+      	if(IPM.afforestation){
+      		IPM.colonized.plots.indexes <- which(map$Medfire.id %in% land[land$distype==afforest,cell.id])
+        		for (col.plot in IPM.colonized.plots.indexes) {
+        			if (sum(ba[col.plot,])>0){
+        				IPM.spp <- which.max(ba[burnt.plot,])
+        				Medfire.spp <- IPM.index.Medfire.spp[IPM.spp]
+        				land$spp[land$cell.id %in%  map$Medfire.id[col.plot]] <- Medfire.spp
+        				clim$spp[clim$cell.id %in%  map$Medfire.id[col.plot]] <- Medfire.spp
+        			} else if(sum(saplings[col.plot,])>0){
+        				IPM.spp <- which.max(saplings[burnt.plot,])
+        				Medfire.spp <- IPM.index.Medfire.spp[IPM.spp]
+        				land$spp[land$cell.id %in%  map$Medfire.id[col.plot]] <- Medfire.spp
+        				clim$spp[clim$cell.id %in%  map$Medfire.id[col.plot]] <- Medfire.spp
+        			} else{
+        				land$spp[land$cell.id %in%  map$Medfire.id[col.plot]] <- 14
+        				clim$spp[clim$cell.id %in%  map$Medfire.id[col.plot]] <- 14
+        			}
+        		}#for colonized plot
+      	}
+      }          	
       
-
       ## 10. GROWTH
       if(MEDFIRE){
         if(processes[growth.id] & t %in% temp.growth.schedule){
@@ -587,14 +743,14 @@ land.dyn.mdl <- function(scn.name){
 
       ##SAVE RESULTS
       if(IPM){
-        if(save.IPM.output){
-        #adult.trees.file <- paste("./dyn_var/trees_", "BCN","_", scenario, "_","x_", n.intervals.mesh, ".rdata",sep="")
-        #ba.file <- paste("./dyn_var/ba_", "BCN","_", scenario, ".rdata", sep="")
-        #saplings.file <- paste("./dyn_var/saplings_", "BCN","_", scenario, ".rdata", sep="")
+        if(save.IPM.variables){
+        adult.trees.file <- paste0("./mdl_interface/output/trees_","scn.name", "_", iyear, "_", "run_",irun, ".rdata")
+        ba.file <- paste0("./mdl_interface/output/ba_","scn.name", "_", iyear, "_", "run_",irun, ".rdata")
+        saplings.file <- paste0("./mdl_interface/output/saplings_","scn.name", "_", iyear, "_", "run_",irun, ".rdata")
         save(adult.trees, file=adult.trees.file)
         save(ba, file=ba.file)
         save(saplings, file=saplings.file)
-        save(IPM.forest.age, file=IPM.forest.age.file)
+        #save(IPM.forest.age, file=IPM.forest.age.file)
         }
       }
       
