@@ -31,6 +31,7 @@ ALL.RESULTS <- F
 
 ##initial year, variables are initialised at 2000 so unless initialisation is modified don't change
 year <- 2000
+t.diff <- 1
 
 ##species to study
 sp.list <- read.csv2("./IPM/lista_especies_v2.csv",header = T,stringsAsFactors = F)

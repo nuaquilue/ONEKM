@@ -154,6 +154,16 @@ build.var.IPM <- function(clim.scn, clim.mdl){
     ba[empty.plots.forest,j] <- aux.ba[,j]
   }
 
+  #########
+  ##Debugging module (under construction)
+  #for (sp in 1:NUM_SP){
+  #   for (pl in 1:NUM_PLOTS){
+  #        if(is.na(sum(adult.trees[[sp]][pl,]))){
+  #             print(paste0("species ",sp," - pl ", pl))
+  #         }
+  #   }
+  #}
+  ########
   save(adult.trees, file=orig.adult.trees.file)
   save(ba, file=orig.ba.file)
   save(saplings, file=orig.saplings.file)
