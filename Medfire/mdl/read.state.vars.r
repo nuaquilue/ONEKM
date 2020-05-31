@@ -16,10 +16,10 @@ read.state.vars <- function(work.path){
   ## Read initial state vars 
   ## When MEDFIRE will be coupled to IPM, maybe MEDFIRE do not need to track 
   ## BIOMASS and AGE state variables.
-  LCF <- raster(paste0(work.path, "/inputlyrs/asc/LCFspp_1km_31N-ETRS89.asc")) 
-  BIOMASS <- raster(paste0(work.path, "/inputlyrs/asc/Biomass_1km_31N-ETRS89.asc")) ##change to updated ones
-  AGE <- raster("inputlyrs/asc/ForestAge_1km_31N-ETRS89.asc") ##change to updated ones
-  TSDIST <- raster(paste0(work.path, "/inputlyrs/asc/tsdist1km_Oriol.asc")) ##change to updated ones
+  LCF <- raster(paste0(work.path, "/Medfire/inputlyrs/asc/LCFspp_1km_31N-ETRS89.asc")) 
+  BIOMASS <- raster(paste0(work.path, "/Medfire/inputlyrs/asc/Biomass_1km_31N-ETRS89.asc")) ##change to updated ones
+  AGE <- raster("Medfire/inputlyrs/asc/ForestAge_1km_31N-ETRS89.asc") ##change to updated ones
+  TSDIST <- raster(paste0(work.path, "/Medfire/inputlyrs/asc/tsdist1km_Oriol.asc")) ##change to updated ones
   
   ## Build data frame with
   ## 1. cell.id, 2. spp, 3. biomass, 4. age, 5. tsdist, 6. distype, and 7. tburnt
@@ -29,6 +29,6 @@ read.state.vars <- function(work.path){
   land$tburnt <- land$distype
   
   ## Save it
-  save(land, file="inputlyrs/rdata/land.rdata")
+  save(land, file="Medfire/inputlyrs/rdata/land.rdata")
    
 }

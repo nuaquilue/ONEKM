@@ -15,16 +15,16 @@ fire.regime <- function(land, coord, orography, pigni, swc, clim.sever, t,
   `%notin%` <- Negate(`%in%`)
   
   ## Read and load input data
-  load("inputlyrs/rdata/pfst.pwind.rdata")
-  clim.severity <- read.table(paste0("inputfiles/", file.clim.severity, ".txt"), header=T)
-  pctg.hot.days <- read.table(paste0("inputfiles/", file.pctg.hot.days, ".txt"), header=T)
-  prob.hot <- read.table("inputfiles/ProbHot.txt", header=T)
-  prob.conv <- read.table("inputfiles/ProbConv.txt", header=T)
-  aba.dist <- read.table("inputfiles/AnnualBurntAreaDist.txt", header=T)
-  fs.dist <- read.table("inputfiles/FireSizeDist.txt", header=T)
-  fire.supp <- read.table(paste0("inputfiles/", file.fire.suppression, ".txt"), header=T)
-  spp.flammability <- read.table("inputfiles/SppFlammability.txt", header=T)
-  fst.sprd.weight <- read.table(paste0("inputfiles/", file.sprd.weight, ".txt"), header=T)
+  load("Medfire/inputlyrs/rdata/pfst.pwind.rdata")
+  clim.severity <- read.table(paste0("Medfire/inputfiles/", file.clim.severity, ".txt"), header=T)
+  pctg.hot.days <- read.table(paste0("Medfire/inputfiles/", file.pctg.hot.days, ".txt"), header=T)
+  prob.hot <- read.table("Medfire/inputfiles/ProbHot.txt", header=T)
+  prob.conv <- read.table("Medfire/inputfiles/ProbConv.txt", header=T)
+  aba.dist <- read.table("Medfire/inputfiles/AnnualBurntAreaDist.txt", header=T)
+  fs.dist <- read.table("Medfire/inputfiles/FireSizeDist.txt", header=T)
+  fire.supp <- read.table(paste0("Medfire/inputfiles/", file.fire.suppression, ".txt"), header=T)
+  spp.flammability <- read.table("Medfire/inputfiles/SppFlammability.txt", header=T)
+  fst.sprd.weight <- read.table(paste0("Medfire/inputfiles/", file.sprd.weight, ".txt"), header=T)
   
   
   ## To be sure that non-burnable covers do not burn (water, rock, urban), nor agriculture land

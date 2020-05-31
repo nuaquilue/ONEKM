@@ -14,7 +14,7 @@ read.sdm <- function(work.path, set){
   library(tidyverse)
   select <- dplyr::select
   ## Mask of the study area
-  load(paste0(work.path, "/inputlyrs/rdata/mask.rdata"))
+  load(paste0(work.path, "/Medfire/inputlyrs/rdata/mask.rdata"))
   
   ## Order species in sdm data.frames
   species <- c("phalepensis",	"pnigra",	"ppinea",	"psylvestris",	"ppinaster",	"puncinata",
@@ -33,7 +33,7 @@ read.sdm <- function(work.path, set){
         print(paste("Building: SDM", clim.scn, "model", clim.mdl, "- decade", decade))
         
         ## Load list of SDMs
-        load(paste0(work.path, "/inputlyrs/rdata/SDM/SDM_", clim.scn,"_proj", decade, ".rdata"))
+        load(paste0(work.path, "/Medfire/inputlyrs/rdata/SDM/SDM_", clim.scn,"_proj", decade, ".rdata"))
         ## Build a data frame with MASK and SDMs per spp
         sdm  <- data.frame(cell.id=1:ncell(MASK), mask=MASK[])        
         ## Change resolution from 1 km to 100m and merge data to the 'sdm' data frame
@@ -45,7 +45,7 @@ read.sdm <- function(work.path, set){
         ## Keep only cells in Catalonia, rename columns and add shrub sdm
         sdm <- filter(sdm, !is.na(mask)) %>% select(-mask) %>% mutate(sdm.shrub=1)
         ## Save it as a .rdata
-        save(sdm, file=paste0(work.path, "/inputlyrs/rdata/sdm_", clim.scn, "_", clim.mdl, "_", decade, ".rdata"))    
+        save(sdm, file=paste0(work.path, "/Medfire/inputlyrs/rdata/sdm_", clim.scn, "_", clim.mdl, "_", decade, ".rdata"))    
         
       }
     }

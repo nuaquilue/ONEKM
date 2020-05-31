@@ -11,13 +11,13 @@ afforestation <- function(land, coord, orography, clim, sdm){
   select <- dplyr::select
   
   ## Read species reproductive age and afforestation model
-        # age.spp <- read.table("inputfiles/SppAges.txt", header=T)  --> all spp have mature age 30
-  afforest.mdl <- unlist(read.table("inputfiles/AfforestMdl.txt", header=T))
-  seed.pressure <- unlist(read.table("inputfiles/SppSeedPressure.txt", header=T))
+        # age.spp <- read.table("Medfire/inputfiles/SppAges.txt", header=T)  --> all spp have mature age 30
+  afforest.mdl <- unlist(read.table("Medfire/inputfiles/AfforestMdl.txt", header=T))
+  seed.pressure <- unlist(read.table("Medfire/inputfiles/SppSeedPressure.txt", header=T))
   
   ## Read coefficients of site quality models
-  site.quality.spp <- read.table("inputfiles/SiteQualitySpp.txt", header=T)
-  site.quality.index <- read.table("inputfiles/SiteQualityIndex.txt", header=T)
+  site.quality.spp <- read.table("Medfire/inputfiles/SiteQualitySpp.txt", header=T)
+  site.quality.index <- read.table("Medfire/inputfiles/SiteQualityIndex.txt", header=T)
   
   ## Num of neighbours in a circular neighbourhood according to radius (radius is in pixels)
   ## Assume that the neighbourhood is a star, with the maximum number of pixels in the

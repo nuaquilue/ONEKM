@@ -52,29 +52,29 @@ land.dyn.mdl <- function(scn.name){
   if(MEDFIRE){
 	  ## Load scenario definition (global variables and scenario parameters)
 	  ## and customized scenario parameters
-	  source(paste0("outputs/", scn.name, "/scn.def.r"))
-	  if(file.exists(paste0("outputs/", scn.name, "/scn.custom.def.r")))
-	    source(paste0("outputs/", scn.name, "/scn.custom.def.r"))
+	  source(paste0("Medfire/outputs/", scn.name, "/scn.def.r"))
+	  if(file.exists(paste0("Medfire/outputs/", scn.name, "/scn.custom.def.r")))
+	    source(paste0("Medfire/outputs/", scn.name, "/scn.custom.def.r"))
 	  ## Load Medfire variables:
 	  ## 1. Mask of the study area (raster)
 	  ## 2. Data frame with cell.id and coordinates x, y
 	  ## 3. Data frame of the model static variables 
 	  ## 4. Data frame with interface value
-	  load("inputlyrs/rdata/mask.rdata")
-	  load("inputlyrs/rdata/coordinates.rdata")
-	  load("inputlyrs/rdata/orography.rdata")
-	  # load("inputlyrs/rdata/harvest.rdata")
-	  load("inputlyrs/rdata/interface.rdata")
+	  load("Medfire/inputlyrs/rdata/mask.rdata")
+	  load("Medfire/inputlyrs/rdata/coordinates.rdata")
+	  load("Medfire/inputlyrs/rdata/orography.rdata")
+	  # load("Medfire/inputlyrs/rdata/harvest.rdata")
+	  load("Medfire/inputlyrs/rdata/interface.rdata")
 	  ## List the name of the forest species
   	  species <- c("phalepensis", "pnigra", "ppinea", "psylvestris", "ppinaster", "puncinata",
                "aalba", "qilex", "qsuber", "qfaginea", "qhumilis", "fsylvatica", "other")
   	  ## Translation equations from Basal Area to Volum, Volum with bark and Carbon
-	  eq.ba.vol <- read.table("inputfiles/EqBasalAreaVol.txt", header=T)
-	  eq.ba.volbark <- read.table("inputfiles/EqBasalAreaVolWithBark.txt", header=T)
-	  eq.ba.carbon <- read.table("inputfiles/EqBasalAreaCarbon.txt", header=T)
+	  eq.ba.vol <- read.table("Medfire/inputfiles/EqBasalAreaVol.txt", header=T)
+	  eq.ba.volbark <- read.table("Medfire/inputfiles/EqBasalAreaVolWithBark.txt", header=T)
+	  eq.ba.carbon <- read.table("Medfire/inputfiles/EqBasalAreaCarbon.txt", header=T)
 	  
 	  ## Climatic severity and pctg hot days tabes
-	  clim.severity <- read.table(paste0("inputfiles/", file.clim.severity, ".txt"), header=T)
+	  clim.severity <- read.table(paste0("Medfire/inputfiles/", file.clim.severity, ".txt"), header=T)
 	  
 	  ## Build the baseline time sequence and the time sequence of the processes (shared for all runs). 
 	  ## 1. Climate change, 2. Land-cover changes, 3. Forest management
@@ -130,7 +130,7 @@ land.dyn.mdl <- function(scn.name){
 	    temp.growth.schedule <- growth.schedule
 
 	    ## Load initial spatial dynamic state variables in a data.frame format
-   		load("inputlyrs/rdata/land.rdata")
+   		load("Medfire/inputlyrs/rdata/land.rdata")
 	}
   	
   	if(IPM){
@@ -255,7 +255,7 @@ land.dyn.mdl <- function(scn.name){
       if(MEDFIRE){
         if(processes[clim.id] & t %in% temp.clim.schedule){
           clim <- update.clim(MASK, land, orography, decade=(1+floor(t/10))*10, clim.scn, clim.mdl)
-          load(paste0("inputlyrs/rdata/sdm_base_", clim.scn, "_", clim.mdl, "_", (1+floor(t/10))*10, ".rdata"))
+          load(paste0("Medfire/inputlyrs/rdata/sdm_base_", clim.scn, "_", clim.mdl, "_", (1+floor(t/10))*10, ".rdata"))
           temp.clim.schedule <- temp.clim.schedule[-1] 
         }
       }
@@ -333,7 +333,7 @@ land.dyn.mdl <- function(scn.name){
         id.fire <- annual.burnt <- 0
         if(processes[fire.id] & t %in% temp.fire.schedule){
           if(iyear < 2019){
-          	hist_fires <- raster(paste0("../historic_fires/Fires_",iyear,".TIF"))
+          	hist_fires <- raster(paste0("./Medfire/historic_fires/Fires_",iyear,".TIF"))
           	burnt.cells <- which(!is.na(hist_fires[]))
           	land$tsdist[land$cell.id %in% burnt.cells] <- 0
             land$tburnt[land$cell.id %in% burnt.cells] <- land$tburnt[land$cell.id %in% burnt.cells] + 1

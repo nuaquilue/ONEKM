@@ -9,14 +9,14 @@ forest.mgmt <- function(land, coord, clim, orography, t){
   ##To avoid library clashes
   select <- dplyr::select
   ## Read management rules
-  mgmt.rules <- read.table("inputfiles/MgmtRules.txt", header=T)
+  mgmt.rules <- read.table("Medfire/inputfiles/MgmtRules.txt", header=T)
   
   ## Eq. of basal area to volume
-  eq.ba.vol <- read.table("inputfiles/EqBasalAreaVol.txt", header=T)
-  # eq.ba.volbark <- read.table("inputfiles/EqBasalAreaVolWithBark.txt", header=T)
+  eq.ba.vol <- read.table("Medfire/inputfiles/EqBasalAreaVol.txt", header=T)
+  # eq.ba.volbark <- read.table("Medfire/inputfiles/EqBasalAreaVolWithBark.txt", header=T)
   
   ## Sawlog and Wood demands
-  dmnd <- read.table(paste0("inputfiles/", file.dmnd.harvest, ".txt"), header=T)
+  dmnd <- read.table(paste0("Medfire/inputfiles/", file.dmnd.harvest, ".txt"), header=T)
   dmnd.sawlog <- dmnd$Sawlogs[t]
   dmnd.wood <- dmnd$Primary[t]
   

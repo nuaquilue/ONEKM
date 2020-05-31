@@ -11,13 +11,13 @@ update.clim <- function(MASK, land, orography, decade, clim.scn, clim.mdl){
   cat("Update climate", "\n")
 
   ## Read coefficients of site quality
-  site.quality.spp <- read.table("inputfiles/SiteQualitySpp.txt", header=T)
-  site.quality.index <- read.table("inputfiles/SiteQualityIndex.txt", header=T)
-  site.quality.shrub <- read.table("inputfiles/SiteQualityShrub.txt", header=T)
+  site.quality.spp <- read.table("Medfire/inputfiles/SiteQualitySpp.txt", header=T)
+  site.quality.index <- read.table("Medfire/inputfiles/SiteQualityIndex.txt", header=T)
+  site.quality.shrub <- read.table("Medfire/inputfiles/SiteQualityShrub.txt", header=T)
   
   ## Update temp and precip
-  load(paste0("inputlyrs/rdata/sdm_", clim.scn, "_", clim.mdl, "_", decade, ".rdata"))
-  load(paste0("inputlyrs/rdata/climate_", clim.scn, "_", clim.mdl, "_", decade, ".rdata"))
+  load(paste0("Medfire/inputlyrs/rdata/sdm_", clim.scn, "_", clim.mdl, "_", decade, ".rdata"))
+  load(paste0("Medfire/inputlyrs/rdata/climate_", clim.scn, "_", clim.mdl, "_", decade, ".rdata"))
   
   ## Join land.cover.spp
   clim$spp <- land$spp

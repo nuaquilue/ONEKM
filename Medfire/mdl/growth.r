@@ -8,9 +8,9 @@ growth.10y <- function(land, clim){
   cat("Species growth", "\n")
   
   ## Read coefficients
-  growth.coeff <- read.table("inputfiles/GrowthSpp.txt", header=T)
-  growth.coeff.shrub <- read.table("inputfiles/GrowthShrub.txt", header=T)
-  ba.ini <- read.table("inputfiles/SppBasalArea10y.txt", header=T)
+  growth.coeff <- read.table("Medfire/inputfiles/GrowthSpp.txt", header=T)
+  growth.coeff.shrub <- read.table("Medfire/inputfiles/GrowthShrub.txt", header=T)
+  ba.ini <- read.table("Medfire/inputfiles/SppBasalArea10y.txt", header=T)
   
   ## Growth of species when SDM in, species when SDM out, and shrub
   aux.spp <- filter(land, spp<=13) %>% select(cell.id, spp, biom, age) %>% 

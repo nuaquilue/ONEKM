@@ -9,14 +9,14 @@ post.fire <- function(land, coord, orography, clim, sdm){
   
   ## Read matrix of secondary species according to species - sqi
   ## and fire response trait per species
-  secondary.spp <- read.table("inputfiles/SecondarySpp.txt", header=T)
-  response.trait <- read.table("inputfiles/FireResponseTrait.txt", header=T)
-  spp.ages <- read.table("inputfiles/SppAges.txt", header=T)
+  secondary.spp <- read.table("Medfire/inputfiles/SecondarySpp.txt", header=T)
+  response.trait <- read.table("Medfire/inputfiles/FireResponseTrait.txt", header=T)
+  spp.ages <- read.table("Medfire/inputfiles/SppAges.txt", header=T)
   
   ## Read coefficients of site quality models
-  site.quality.spp <- read.table("inputfiles/SiteQualitySpp.txt", header=T)
-  site.quality.index <- read.table("inputfiles/SiteQualityIndex.txt", header=T)
-  site.quality.shrub <- read.table("inputfiles/SiteQualityShrub.txt", header=T)
+  site.quality.spp <- read.table("Medfire/inputfiles/SiteQualitySpp.txt", header=T)
+  site.quality.index <- read.table("Medfire/inputfiles/SiteQualityIndex.txt", header=T)
+  site.quality.shrub <- read.table("Medfire/inputfiles/SiteQualityShrub.txt", header=T)
   
   ## Num of neighbours in a circular neighbourhood according to radius (radius is in pixels)
   ## Assume that the neighbourhood is a star, with the maximum number of pixels in the

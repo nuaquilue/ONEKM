@@ -4,9 +4,9 @@ update.interface <- function(land){
   cat("Update interfaces", "\n")
   
   ## UTM df
-  load("inputlyrs/rdata/utm.rdata")
-  load("inputlyrs/rdata/utm_1hac.rdata")
-  load("inputlyrs/rdata/land_1hac.rdata")
+  load("Medfire/inputlyrs/rdata/utm.rdata")
+  load("Medfire/inputlyrs/rdata/utm_1hac.rdata")
+  load("Medfire/inputlyrs/rdata/land_1hac.rdata")
   
   ## Join utm info to land
   land.utm <- left_join(land_1hac, utm_1hac, by="cell.id") 
@@ -64,7 +64,7 @@ update.interface <- function(land){
   land.utm.1km <- left_join(land, utm, by="cell.id") 
   land.utm.1km <- left_join(land.utm.1km, select(interface, utm, x), by="utm") %>% select(x)
   interface <- land.utm.1km
-  save(interface, file="inputlyrs/rdata/interface.rdata")
+  save(interface, file="Medfire/inputlyrs/rdata/interface.rdata")
   return(land.utm.1km)
     
 }

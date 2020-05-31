@@ -15,8 +15,8 @@ land.cover.change <- function(land, coord, interface, lc.trans=1, t, visit.cells
 
   
   ## Read input data
-  dmnd.lchg <- read.table(paste0("inputfiles/", file.dmnd.lchg, ".txt"), header=T)
-  pattern.lchg <- read.table(paste0("inputfiles/", file.pattern.lchg, ".txt"), header=T)  
+  dmnd.lchg <- read.table(paste0("Medfire/inputfiles/", file.dmnd.lchg, ".txt"), header=T)
+  pattern.lchg <- read.table(paste0("Medfire/inputfiles/", file.pattern.lchg, ".txt"), header=T)  
   
   
   ## Join land-cover/spp info to coordinates to preselect coordinates of those cells that may
