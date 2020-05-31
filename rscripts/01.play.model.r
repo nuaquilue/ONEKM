@@ -1,7 +1,8 @@
 rm(list=ls())
 
 ## Change to local directory
-setwd("C:/Users/uriso/Desktop/ONEKM") #Oriol laptop
+#setwd("C:/Users/uriso/Desktop/ONEKM") #Oriol laptop
+setwd("C:/Users/Administrator/Oriol/ONEKM") #remote Brotons lab
 ## Load required packages and functions 
 library(tidyverse)
 library(sp)
@@ -27,7 +28,7 @@ system.time(land.dyn.mdl(scn.name))
 source("mdl/read.static.vars.r")
 source("mdl/read.state.vars.r")
 source("mdl/read.climatic.vars.r")
-work.path <- "C:/Users/uriso/Desktop/ONEKM"
+work.path <- "C:/Users/uriso/Desktop/ONEKM" #oriol laptop
 #adapt.climatic.vars(work.path)
 # Create .Rdata with static variables of the model, only run once for all scenarios!
 read.static.vars(work.path)
