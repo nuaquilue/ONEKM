@@ -4,13 +4,13 @@ cat("Initializing IPM parameters", "\n")
 ##study area
 study.area <- "BCN"
 ##load valid plots map
-if(file.exists(paste0("/mdl_interface/IPM_",study.area, "_map.rdata"))){
-	load(paste0("/mdl_interface/IPM_",study.area, "_map.rdata"))
+if(file.exists(paste0("./mdl_interface/IPM_",study.area, "_map.rdata"))){
+	load(paste0("./mdl_interface/IPM_",study.area, "_map.rdata"))
 	cat("IPM valid plots map loaded\n")
 } else{
 	cat("creating IPM valid plots map\n")
 	select.valid.plots(study.area)
-	load((paste0(work.path,"/mdl_interface/IPM_",study.area, "_map.rdata"))
+	load((paste0(work.path,"/mdl_interface/IPM_",study.area, "_map.rdata")))
 }
 NUM_PLOTS <- nrow(map)
 # spain <- readOGR(dsn=".",layer="inland.spain_UTM")
@@ -20,7 +20,7 @@ spain <- rgdal::readOGR(dsn="./IPM",layer="bcn_UTM_v1")
 spain.df <- fortify(spain)
 
 ## what do we want to store?
-save.IPM.variables <- F
+save.IPM.variables <- T
 store.original.dbh.dist <- F 
 store.original.abundances <- F 
 store.decadal.dbh.dist <- F
@@ -84,7 +84,7 @@ param.sapl1 <- saplings.coef$binom
 param.ingrowth1 <- ingrowth.coef$lambda
 
 ## Colonization parameters
-COLONIZATION <- T ##do we want colonization?
+COLONIZATION <- F ##do we want colonization?
 max.dist <- 1500 ##meters
 colonization.threshold <- 0.05
 BASAL.AREA.THRESHOLD <- T
@@ -107,8 +107,10 @@ new.saplings <- c(297.9471,
                   309.4185,
                   242.8038,
                   502.7275)
-load("./IPM/regresiones/colonization_v3")
-load("./IPM/distancias_hasta_2236_v2") 
+if(COLONIZATION){
+  load("./IPM/regresiones/colonization_v3")
+  load("./IPM/distancias_hasta_2236_v2")
+}
 
 ##hard coded fire.regeneration, needs to be changed so it's a file
 fire.regeneration <- c(T,T,T,F,T,F,T,F,F,F,T,T,T,T,T,T)
@@ -117,3 +119,5 @@ orig.adult.trees.file <- paste("./IPM/initial_variables/trees_", study.area,"_",
 orig.ba.file <- paste("./IPM/initial_variables/ba_", study.area,"_", n.intervals.mesh, ".rdata",sep="")
 orig.saplings.file <- paste("./IPM/initial_variables/saplings_", study.area,"_", n.intervals.mesh, ".rdata",sep="")
 orig.plots.age.file <- paste("./IPM/initial_variables/orig_plots_age", study.area, ".rdata",sep="")
+
+cat("IPM parameters and static variables loaded\n")

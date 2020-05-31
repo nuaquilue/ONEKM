@@ -5,7 +5,8 @@
 ONEKM.Rproj
 asc/
 outputs/
-IPM/
+IPM/regresiones/
+IPM/initial_variables/
 output/
 dyn_var_IPM/
 *.docx

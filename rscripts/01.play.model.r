@@ -16,8 +16,8 @@ scn.name <- "ONEKM-v2"
 define.scenario(scn.name)
 
 #run coupled
-source("mdl_coupling/run_coupled.r")
-system.time(IPM.Medfire.mdl(scn.name))
+source("mdl_interface/land.dyn.mdl.r")
+system.time(land.dyn.mdl(scn.name))
 
 # run the model
 source("mdl/land.dyn.mdl.r")  

@@ -6,6 +6,10 @@ MEDFIRE <- F
 clim.scn <- "rcp45"
 clim.mdl <- "SMHI-RCA4_MOHC-HadGEM2-ES"
 
+time.horizon <- 89
+nrun <- 1
+testing <- T
+work.path <- "C:/Users/uriso/Desktop/ONEKM"
 ##Species interface vectors	                  
 Medfire.index.IPM.spp<-c(5,6,8,9,7,10,2,12,15,11,11,3,1) #quercus humilis and faginea are classified as the same for IPM
 IPM.index.Medfire.spp <-c(13,13,12,13,1,2,5,3,4,6,11,8,13,13,9,13) #classified as other (13): coniferes(1), decideous(2), juniperus(4), quercus pyrenaica(13), quercus robur(14) and 	Sclerophyllous (16)

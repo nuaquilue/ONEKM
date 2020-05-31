@@ -30,7 +30,7 @@ land.dyn.mdl <- function(scn.name){
   sourceCpp("Medfire/mdl/is.in.cpp")
 
   ##IPM functions
-  source("./IPM/auxiliary_functions_v9 - Roberto.R")
+  source("./IPM/auxiliary_functions_v10 - Roberto.R")
   source("./IPM/IPM_functions_v20_old.R")
   source("./mdl_interface/build.var.IPM.r")
   source("./mdl_interface/read_IPM_age.r")
@@ -47,7 +47,8 @@ land.dyn.mdl <- function(scn.name){
 	  source(paste0("mdl_interface/IPM_parameters.r"))
   }
 	  
-
+  time.seq <- seq(-9, time.horizon, 1) # From -9 to 0 runs IPM from 2000 to 2009
+  
   if(MEDFIRE){
 	  ## Load scenario definition (global variables and scenario parameters)
 	  ## and customized scenario parameters
@@ -79,7 +80,6 @@ land.dyn.mdl <- function(scn.name){
 	  ## 1. Climate change, 2. Land-cover changes, 3. Forest management
 	  ## 4. Wildfires, 5. Prescribed burns, 6. Drought, 7. Post-fire regeneration,
 	  ## 8. Cohort establihsment, 9. Afforestation, 10. Growth
-	  time.seq <- seq(-9, time.horizon, 1) # From -9 to 0 runs IPM from 2000 to 2009
 	  if(time.horizon==1)
 	    clim.schedule <- 1
 	  else
@@ -106,32 +106,35 @@ land.dyn.mdl <- function(scn.name){
 	  track.post.fire <- data.frame(run=NA, year=NA, spp.out=NA, Var2=NA, Freq=NA)
 	  track.afforest <- data.frame(run=NA, year=NA, Var1=NA, Freq=NA)
 	  track.land <- data.frame(run=NA, year=NA, spp=NA, area=NA, vol=NA, volbark=NA, carbon=NA)
+	  
+	  ## Set the directory for writing spatial outputs (create it, if it does not exist yet) 
+	  if(write.sp.outputs){      
+	    if(!file.exists(paste0(out.path, "/lyr")))
+	      dir.create(file.path(getwd(), out.path, "/lyr"), showWarnings = F) 
+	  }
   }
-  
-  ## Set the directory for writing spatial outputs (create it, if it does not exist yet) 
-  if(write.sp.outputs){      
-    if(!file.exists(paste0(out.path, "/lyr")))
-      dir.create(file.path(getwd(), out.path, "/lyr"), showWarnings = F) 
-  }
-  
   
   ## Start the simulations   
   for(irun in 1:nrun){
-    
-    ## Copy the schedulings in auxiliar vectors (only for those processes included in the current version)
-    temp.clim.schedule <- clim.schedule
-    temp.lchg.schedule <- lchg.schedule
-    temp.fmgmt.schedule <- fmgmt.schedule
-    temp.fire.schedule <- fire.schedule
-    temp.pb.schedule <- pb.schedule
-    temp.drought.schedule <- drought.schedule
-    temp.post.fire.schedule <- post.fire.schedule
-    temp.cohort.schedule <- cohort.schedule
-    temp.afforest.schedule <- afforest.schedule
-    temp.growth.schedule <- growth.schedule
+    if(MEDFIRE){
+	    ## Copy the schedulings in auxiliar vectors (only for those processes included in the current version)
+	    temp.clim.schedule <- clim.schedule
+	    temp.lchg.schedule <- lchg.schedule
+	    temp.fmgmt.schedule <- fmgmt.schedule
+	    temp.fire.schedule <- fire.schedule
+	    temp.pb.schedule <- pb.schedule
+	    temp.drought.schedule <- drought.schedule
+	    temp.post.fire.schedule <- post.fire.schedule
+	    temp.cohort.schedule <- cohort.schedule
+	    temp.afforest.schedule <- afforest.schedule
+	    temp.growth.schedule <- growth.schedule
+
+	    ## Load initial spatial dynamic state variables in a data.frame format
+   		load("inputlyrs/rdata/land.rdata")
+	}
   	
-  	if(MEDFIRE){
-    ## Load IPM dynamic variables
+  	if(IPM){
+      ## Load IPM dynamic variables
 	  if (file.exists(orig.adult.trees.file) & file.exists(orig.ba.file) & file.exists(orig.saplings.file)){
 		  load(orig.adult.trees.file); load(orig.ba.file); load(orig.saplings.file) 
 		  cat("IPM initial variables loaded\n")
@@ -140,11 +143,32 @@ land.dyn.mdl <- function(scn.name){
 	  	  load(orig.adult.trees.file); load(orig.ba.file); load(orig.saplings.file) 
 	      cat("IPM initial variables loaded\n")
 	  }
+
+	  ##IPM plots age
 	  if (file.exists(orig.plots.age.file)){
 	  	load(orig.plots.age.file) ## to do
 	  } else{
-	  	read_IPM_age(clim.scn, clim.mdl)
+	  	read.IPM.age(ba, map)
+	    cat("building age variable\n")
 	  	load(orig.plots.age.file)
+	  }
+    cat("IPM age loaded\n")
+	  if(testing){
+	  	 ##select a smaller number of cells within Barcelona
+		 ini_cells <- c()
+		 NUM_PLOTS <- 100
+		 i <- 1
+		 while(length(ini_cells)<NUM_PLOTS){
+		   if (sum(ba[i,])>0){
+		     ini_cells <- c(ini_cells, i)
+		   }
+		   i <- i +1
+		 }
+		 map <- map[ini_cells,]
+		 ba <- ba[ini_cells,]
+		 saplings <- saplings[ini_cells,]
+		 IPM.forest.age <- IPM.forest.age[ini_cells,]
+		 adult.trees<- lapply(adult.trees, function(x) {x[ini_cells,]})
 	  }
     
 	  if(ALL.RESULTS){
@@ -218,8 +242,6 @@ land.dyn.mdl <- function(scn.name){
 	  }# if ALL.RESULTS
     }#if IPM    
     
-    ## Load initial spatial dynamic state variables in a data.frame format
-    load("inputlyrs/rdata/land.rdata")
     
     iyear <- 2000
     ## Start the discrete time sequence 
@@ -439,7 +461,8 @@ land.dyn.mdl <- function(scn.name){
               } #for species 
             ba[burnt.cells.IPM.index,]<- ba[burnt.cells.IPM.index,]*(1-fintensity[!burnt.intens][burnt.IPM.i])
             saplings[burnt.cells.IPM.index,]<- saplings[burnt.cells.IPM.index,]*(1-fintensity[!burnt.intens][burnt.IPM.i])
-        }
+			}
+		}##if IPM
         ##MEDFIRE
         if(processes[post.fire.id] & t %in% temp.post.fire.schedule){
             ## forest transition of tree species burnt in high intensity
@@ -568,7 +591,7 @@ land.dyn.mdl <- function(scn.name){
       			if(length(to.colonize.IPM.i)>0){
       				#k <- match(to.colonize.ID,map$ID)
       				for(j in to.colonize.IPM.i){
-      					spp.Medfire <- land$spp[land$cell.id==map$Medfire.id[to.colonize.IPM.i[j]]
+      					spp.Medfire <- land$spp[land$cell.id==map$Medfire.id[to.colonize.IPM.i[j]]]
       					spp.IPM <- Medfire.index.IPM.spp[spp.Medfire]
       					saplings[to.colonize.IPM.i[j], spp.IPM] <- new.saplings[spp.IPM]
       				}
@@ -636,7 +659,7 @@ land.dyn.mdl <- function(scn.name){
         ## IPM loop        
         for (i in 1:NUM_PLOTS) {
           
-          if (round(i/100)*100==i) print(paste(date(),"- IPM: running loop",i,"of",NUM_PLOTS," - year",iyear,sep=" "))
+          if (round(i/10)*10==i) print(paste(date(),"- IPM: running loop",i,"of",NUM_PLOTS," - year",iyear,sep=" "))
           
           sapl <- saplings[i,] ##store old saplings so it can be used by ingrowth function
           
@@ -676,8 +699,7 @@ land.dyn.mdl <- function(scn.name){
                                                            t_diff=t.diff,
                                                            max_diam=max.diam[j],
                                                            h=h[j],
-                                                           nx=nx,
-                                                           y_minus_x=y.minus.x[,,j])          
+                                                           nx=nx)          
                   adult.trees[[j]][i,] <- dummy
                   
                   ##Calculate newsaplings 
@@ -821,5 +843,4 @@ land.dyn.mdl <- function(scn.name){
     write.table(track.afforest[-1,], paste0(out.path, "/Afforestation.txt"), quote=F, row.names=F, sep="\t")
     write.table(track.land[-1,], paste0(out.path, "/Land.txt"), quote=F, row.names=F, sep="\t")
   }
-
 }
