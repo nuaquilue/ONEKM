@@ -139,7 +139,8 @@ land.dyn.mdl <- function(scn.name){
 		  load(orig.adult.trees.file); load(orig.ba.file); load(orig.saplings.file) 
 		  cat("IPM initial variables loaded\n")
 	  } else{
-	  	  build.var.IPM()
+	      cat("building IPM dynamic variables\n")
+	  	  build.var.IPM(clim.scn, clim.mdl)
 	  	  load(orig.adult.trees.file); load(orig.ba.file); load(orig.saplings.file) 
 	      cat("IPM initial variables loaded\n")
 	  }
@@ -164,11 +165,17 @@ land.dyn.mdl <- function(scn.name){
 		   }
 		   i <- i +1
 		 }
-		 map <- map[ini_cells,][72,]
-		 ba <- ba[ini_cells,][72,]
-		 saplings <- saplings[ini_cells,][72,]
-		 IPM.forest.age <- IPM.forest.age[ini_cells,][72,]
-		 adult.trees<- lapply(adult.trees, function(x) {x[ini_cells,][72,]})
+		 map <- map[ini_cells,]
+		 ba <- ba[ini_cells,]
+		 saplings <- saplings[ini_cells,]
+		 IPM.forest.age <- IPM.forest.age[ini_cells,]
+		 adult.trees<- lapply(adult.trees, function(x) {x[ini_cells,]})
+		 NUM_PLOTS <- 2
+		 map <- map[c(72,79),]
+		 ba <- ba[c(72,79),]
+		 saplings<-saplings[c(72,79),]
+		 adult.trees<- lapply(adult.trees, function(x) {x[c(72,79),]})
+		 IPM.forest.age <- IPM.forest.age[c(72,79),]
 	  }
 
     

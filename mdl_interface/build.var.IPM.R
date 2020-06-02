@@ -8,7 +8,9 @@
 build.var.IPM <- function(clim.scn, clim.mdl){
     
   if (n.intervals.mesh<7) stop("Mesh size must be larger than 8")
-
+  
+  ##load climate
+  load(paste0("IPM/clima/climate_", clim.scn, "_", clim.mdl, "_00.rdata"))
   ##Reads IFN data of plots to study
   trees.orig <- read.csv2("./IPM/PIES_MAYORES_IFN3_v10.csv",header = T,stringsAsFactors = F)
   trees.orig$dbh <- as.numeric(trees.orig$dbh)
@@ -79,7 +81,6 @@ build.var.IPM <- function(clim.scn, clim.mdl){
       my.plot <- aux.data$num.plot[i]
       my.sp <- aux.data$num.sp[i]
       clima.index <- which(clima_IPM$Medfire.id == map$Medfire.id[my.plot])
-      load(paste0("mdl_interface/inputlyrs/rdata/climate_", clim.scn, "_", clim.mdl, "_00.rdata"))
       
       q <- c(clima_IPM$precip[clima.index],clima_IPM$temp[clima.index],plot.predicted.ba$ba[my.plot],clima_IPM$anom_pl[clima.index],clima_IPM$anom_temp[clima.index])
       
