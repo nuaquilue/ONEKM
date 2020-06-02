@@ -7,6 +7,7 @@ using namespace std::chrono;
 
 using namespace Rcpp;
 
+// [[Rcpp::export]]
 NumericVector fExpCpp(NumericVector x, NumericVector param, int t_diff, double max_diam){
   int n = x.size();
   NumericVector q = (max_diam - x) * (1-exp(-t_diff*(param[0]*log(x)+param[1])));
@@ -74,8 +75,8 @@ void my_dlnorm(NumericVector means, NumericVector sds, double h, int nx, Numeric
 
 }
 
-
-void InverseFentonWilkinson(NumericVector Mu, NumericVector Var, NumericVector vx, NumericVector mx) {
+// [[Rcpp::export]]
+void InverseFentonWilkinson(NumericVector Mu, NumericVector Var,  NumericVector mx, NumericVector vx) {
     vx = log(10*(exp(Var)-1)+1);
     mx = Mu-(vx-Var)/2-log(10);
 }
