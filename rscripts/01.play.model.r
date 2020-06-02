@@ -16,11 +16,13 @@ source("mdl/define.scenario.r")
 scn.name <- "ONEKM-v2"
 define.scenario(scn.name)
 
+scn.name <- "new.logN.1.72.79"
 #run coupled
 source("mdl_interface/land.dyn.mdl.r")
 system.time(land.dyn.mdl(scn.name))
 
 # run the model
+scn.name <- "plot72.5000"
 source("mdl/land.dyn.mdl.r")  
 system.time(land.dyn.mdl(scn.name))
 
