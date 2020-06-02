@@ -164,12 +164,13 @@ land.dyn.mdl <- function(scn.name){
 		   }
 		   i <- i +1
 		 }
-		 map <- map[ini_cells,]
-		 ba <- ba[ini_cells,]
-		 saplings <- saplings[ini_cells,]
-		 IPM.forest.age <- IPM.forest.age[ini_cells,]
-		 adult.trees<- lapply(adult.trees, function(x) {x[ini_cells,]})
+		 map <- map[ini_cells,][72,]
+		 ba <- ba[ini_cells,][72,]
+		 saplings <- saplings[ini_cells,][72,]
+		 IPM.forest.age <- IPM.forest.age[ini_cells,][72,]
+		 adult.trees<- lapply(adult.trees, function(x) {x[ini_cells,][72,]})
 	  }
+
     
 	  if(ALL.RESULTS){
 	    results <- list()
@@ -779,15 +780,12 @@ land.dyn.mdl <- function(scn.name){
         }# for i in plots
       }
 
-
-      iyear <- iyear +1
-
       ##SAVE RESULTS
       if(IPM){
         if(save.IPM.variables){
-        adult.trees.file <- paste0("./mdl_interface/output/trees_","scn.name", "_", iyear, "_", "run_",irun, ".rdata")
-        ba.file <- paste0("./mdl_interface/output/ba_","scn.name", "_", iyear, "_", "run_",irun, ".rdata")
-        saplings.file <- paste0("./mdl_interface/output/saplings_","scn.name", "_", iyear, "_", "run_",irun, ".rdata")
+        adult.trees.file <- paste0("./mdl_interface/output/trees_",scn.name, "_", iyear, "_", "run_",irun, ".rdata")
+        ba.file <- paste0("./mdl_interface/output/ba_",scn.name, "_", iyear, "_", "run_",irun, ".rdata")
+        saplings.file <- paste0("./mdl_interface/output/saplings_",scn.name, "_", iyear, "_", "run_",irun, ".rdata")
         save(adult.trees, file=adult.trees.file)
         save(ba, file=ba.file)
         save(saplings, file=saplings.file)
@@ -809,7 +807,8 @@ land.dyn.mdl <- function(scn.name){
           writeRaster(MAP, paste0(out.path, "/lyr/DistType_r", irun, "t", t, ".tif"), format="GTiff", overwrite=T)
         }
       }
-      
+
+      iyear <- iyear +1
       ## Deallocate memory
       gc()  
       cat("\n")
