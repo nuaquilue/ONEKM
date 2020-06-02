@@ -34,7 +34,7 @@ land.dyn.mdl <- function(scn.name){
   source("./IPM/IPM_functions_v20_old.R")
   source("./mdl_interface/build.var.IPM.r")
   source("./mdl_interface/read_IPM_age.r")
-  sourceCpp("./IPM/IPM_functions_v21_1_Year.cpp")
+  sourceCpp("./IPM/IPM_functions_v22_1_Year.cpp")
   
   ##To avoid library clashes
   select <- dplyr::select
