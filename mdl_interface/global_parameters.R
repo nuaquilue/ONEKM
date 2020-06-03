@@ -6,7 +6,7 @@ MEDFIRE <- F
 clim.scn <- "rcp45"
 clim.mdl <- "SMHI-RCA4_MOHC-HadGEM2-ES"
 
-time.horizon <- 79
+time.horizon <- 80
 nrun <- 1
 testing <- T
 #work.path <- "C:/Users/uriso/Desktop/ONEKM" #Laptop oriol

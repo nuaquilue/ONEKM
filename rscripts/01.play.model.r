@@ -1,4 +1,5 @@
 rm(list=ls())
+gc()
 
 ## Change to local directory
 #setwd("C:/Users/uriso/Desktop/ONEKM") #Oriol laptop
@@ -16,7 +17,7 @@ source("mdl/define.scenario.r")
 scn.name <- "ONEKM-v2"
 define.scenario(scn.name)
 
-scn.name <- "new.logN.1.72.79"
+scn.name <- "11_plots_v4_8000"
 #run coupled
 source("mdl_interface/land.dyn.mdl.r")
 system.time(land.dyn.mdl(scn.name))

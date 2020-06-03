@@ -46,7 +46,7 @@ quercus <- c(11,12,13,14,15,16)
 
 ## adult trees discretization parameters
 min.DBH <- 7.5  # in cm.
-n.intervals.mesh <- 4000 ##Discretization DBH
+n.intervals.mesh <- 8000 ##Discretization DBH
 x <- x.per.species(min.dbh=min.DBH,n.intervals=n.intervals.mesh)
 y <- x
 x2 <- (x/200)^2
@@ -84,6 +84,7 @@ param.sapl1 <- saplings.coef$binom
 param.ingrowth1 <- ingrowth.coef$lambda
 
 ## Colonization parameters
+ingrowth <- F
 COLONIZATION <- F ##do we want colonization?
 max.dist <- 1500 ##meters
 colonization.threshold <- 0.05

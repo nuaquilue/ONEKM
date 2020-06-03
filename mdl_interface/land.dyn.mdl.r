@@ -170,12 +170,14 @@ land.dyn.mdl <- function(scn.name){
 		 saplings <- saplings[ini_cells,]
 		 IPM.forest.age <- IPM.forest.age[ini_cells,]
 		 adult.trees<- lapply(adult.trees, function(x) {x[ini_cells,]})
-		 NUM_PLOTS <- 3
-		 map <- map[c(1,72,79),]
-		 ba <- ba[c(1,72,79),]
-		 saplings<-saplings[c(1,72,79),]
-		 adult.trees<- lapply(adult.trees, function(x) {x[c(1,72,79),]})
-		 IPM.forest.age <- IPM.forest.age[c(1,72,79),]
+		 
+		 NUM_PLOTS <- 11
+		 target<-c(9,10,25,30,77,79,81,90,93,94,96)
+		 map <- map[target,]
+		 ba <- ba[target,]
+		 saplings <- saplings[target,]
+		 IPM.forest.age <- IPM.forest.age[target,]
+		 adult.trees<- lapply(adult.trees, function(x) {x[target,]})
 	  }
 
     
@@ -742,25 +744,27 @@ land.dyn.mdl <- function(scn.name){
             }# if(sum(unlist(trees[[i]]$ba))>0)
 
             ## if saplings on the previous step, apply INGROWTH
-            if(sum(sapl)>0){
-
-                param.ingrowth2 <-  CoefTimesVarCpp(param=ingrowth.coef,z=q,s=sapl,type="ingrowth")
-
-                order <- sample(x = 1:NUM_SP,size = NUM_SP,replace = F)
-                for(j in order){
-
-                  if(sapl[j] > 0 & (!BASAL.AREA.THRESHOLD | (sum(ba[i,]) < BA_threshold$perc_95[j])) & IPM.forest.age[i,j]>9){
-
-                    dummy <- IPMIngrowthIdentityCpp(y[,j],c(param.ingrowth1[j],param.ingrowth2[j]))
-                    adult.trees[[j]][i,] <- adult.trees[[j]][i,] + dummy
-
-                    if(ALL.RESULTS){
-                      results[[j]][i,my.new.adults] <- quadTrapezCpp_1(dummy,h[j],nx)
-                      results[[j]][i,my.adults] <- quadTrapezCpp_1(adult.trees[[j]][i,],h[j],nx)
-                    }
-                  }# if basal area threshold is met for j-th species and there are saplings older than 9 yo
-                } # for all j-th species
-              } # if there are saplings of any sp
+            if(ingrowth){
+              if(sum(sapl)>0){
+  
+                  param.ingrowth2 <-  CoefTimesVarCpp(param=ingrowth.coef,z=q,s=sapl,type="ingrowth")
+  
+                  order <- sample(x = 1:NUM_SP,size = NUM_SP,replace = F)
+                  for(j in order){
+  
+                    if(sapl[j] > 0 & (!BASAL.AREA.THRESHOLD | (sum(ba[i,]) < BA_threshold$perc_95[j])) & IPM.forest.age[i,j]>9){
+  
+                      dummy <- IPMIngrowthIdentityCpp(y[,j],c(param.ingrowth1[j],param.ingrowth2[j]))
+                      adult.trees[[j]][i,] <- adult.trees[[j]][i,] + dummy
+  
+                      if(ALL.RESULTS){
+                        results[[j]][i,my.new.adults] <- quadTrapezCpp_1(dummy,h[j],nx)
+                        results[[j]][i,my.adults] <- quadTrapezCpp_1(adult.trees[[j]][i,],h[j],nx)
+                      }
+                    }# if basal area threshold is met for j-th species and there are saplings older than 9 yo
+                  } # for all j-th species
+                } # if there are saplings of any sp
+            }
             
             ## if any of the two conditions is met (saplings or adults), update basal area of the plot and age
             order <- sample(x = 1:NUM_SP,size = NUM_SP,replace = F)
