@@ -34,7 +34,7 @@ land.dyn.mdl <- function(scn.name){
   source("./IPM/IPM_functions_v20_old.R")
   source("./mdl_interface/build.var.IPM.r")
   source("./mdl_interface/read_IPM_age.r")
-  sourceCpp("./IPM/IPM_functions_v22_1_Year.cpp")
+  sourceCpp("./IPM/IPM_functions_v23_1_Year.cpp")
   
   ##To avoid library clashes
   select <- dplyr::select
@@ -171,13 +171,13 @@ land.dyn.mdl <- function(scn.name){
 		 IPM.forest.age <- IPM.forest.age[ini_cells,]
 		 adult.trees<- lapply(adult.trees, function(x) {x[ini_cells,]})
 		 
-		 NUM_PLOTS <- 11
-		 target<-c(9,10,25,30,77,79,81,90,93,94,96)
-		 map <- map[target,]
-		 ba <- ba[target,]
-		 saplings <- saplings[target,]
-		 IPM.forest.age <- IPM.forest.age[target,]
-		 adult.trees<- lapply(adult.trees, function(x) {x[target,]})
+		 # NUM_PLOTS <- 11
+		 # target<-c(9,10,25,30,77,79,81,90,93,94,96)
+		 # map <- map[target,]
+		 # ba <- ba[target,]
+		 # saplings <- saplings[target,]
+		 # IPM.forest.age <- IPM.forest.age[target,]
+		 # adult.trees<- lapply(adult.trees, function(x) {x[target,]})
 	  }
 
     
