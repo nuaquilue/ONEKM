@@ -13,17 +13,17 @@ library(RANN)
 map.csv <- "MAP_BCN_v1.csv"
 
 # set the scenario
-source("mdl/define.scenario.r")
-scn.name <- "ONEKM-v2"
+source("Medfire/mdl/define.scenario.r")
+scn.name <- "test_only_medfire_2"
 define.scenario(scn.name)
 
-scn.name <- "100_plots_v4"
+
 #run coupled
+scn.name <- "growth_death_ingrowth_2000"
 source("mdl_interface/land.dyn.mdl.r")
 system.time(land.dyn.mdl(scn.name))
 
 # run the model
-scn.name <- "plot72.5000"
 source("mdl/land.dyn.mdl.r")  
 system.time(land.dyn.mdl(scn.name))
 

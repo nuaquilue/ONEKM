@@ -16,15 +16,16 @@
 define.scenario <- function(scn.name){
 
   cat("Initializing parameters", "\n")
+
+  ## Output directory (do not never change that, please!)
+  out.path <- paste0("Medfire/outputs/", scn.name)
   
-  ## Time lenght (in years) of a model simulation, from 2010 to 2100
-  time.horizon <- 10
   
   ## Number of runs (i.e. replicas)
-  nrun <- 3
+  #nrun <- 5
   
   ## Flags to write spatial and tabular output data
-  write.sp.outputs <- FALSE
+  write.sp.outputs <- TRUE
   
   ## Processes of the model included (TRUE-IN our FALSE-OUT),
   processes <- c(TRUE,   # 1. Climate change
@@ -37,6 +38,7 @@ define.scenario <- function(scn.name){
                  FALSE,  # 8. Cohort establihsment
                  FALSE,  # 9. Afforestation
                  TRUE)   # 10. Growth
+  burn.hist.fires <- FALSE
   ##We want inputs from IPM?
   IPM.post.fire <- FALSE
   IPM.afforestation <- FALSE
@@ -68,12 +70,11 @@ define.scenario <- function(scn.name){
     
   
   ## Initialize model global parameters (equal for all scn)
-  spp.distrib.rad <- 20   # neighborhood radius to determine which species belong to that region (in pixels)
-  shrub.colon.rad <- 5    #
+  spp.distrib.rad <- 2   # neighborhood radius to determine which species belong to that region (in pixels)
+  shrub.colon.rad <- 1    #
 
   
   ## Fire parameters (should not change to much): Spread rate, burn probability, prescribed burns
-  rpb <- 1
   pb.upper.th <- 0.75
   pb.lower.th <- 0.05
   fire.intens.th <- 0.35  # high vs. low intensity fire, SR_noAcc <= fire.intens.th
@@ -86,17 +87,17 @@ define.scenario <- function(scn.name){
   
     
   ## Scenario parameters
-  clim.scn <- "rcp45"
-  clim.mdl <- "SMHI-RCA4_MOHC-HadGEM2-ES"
   file.dmnd.lchg <- "DemandLChg"
   file.pattern.lchg  <- "PatternLChg"
   file.dmnd.harvest <- "DemandHarvest"
   file.clim.severity <- "ClimaticSeverity"
   file.pctg.hot.days <- "PctgHotDays_noCC"
-  file.fire.suppression <- "FireSuppression_CurrExtrem"
-  file.sprd.weight <- "SprdRateWeights"
-    
+  file.fire.suppression <- "FireSuppression"
+  file.sprd.weight <- "WeightSprdFactors"
   
+  ## Save all the variables in .r file to be further loaded by landscape.dyn.r
+  if(!file.exists(out.path))
+    dir.create(file.path(getwd(), out.path), showWarnings = T) 
   ## Save all the variables in .r file to be further loaded by landscape.dyn.r
   dump(ls(), paste0(out.path, "/scn.def.r"))
   

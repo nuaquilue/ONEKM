@@ -27,7 +27,7 @@ afforestation <- function(land, coord, orography, clim, sdm){
   
   ## Coordinates of killed cells and their closest neighbours (do not count for the cell itself)
   shrub.coord <- filter(land, tsdist>=20, spp==14) %>% select(cell.id) 
-  shrub.coord <- data.frame(cell.id=shrub.coord[sample(1:nrow(shrub.coord), 10000, replace=F),1])
+  shrub.coord <- data.frame(cell.id=shrub.coord[sample(1:nrow(shrub.coord), 100, replace=F),1])
   shrub.coord <- left_join(shrub.coord, coord, by = "cell.id")
   neigh.id <- nn2(coord[,-1], shrub.coord[,-1],  searchtype="priority", k=nneigh[shrub.colon.rad]) 
   neigh.id <- neigh.id$nn.idx  # dim 10.000 x 61

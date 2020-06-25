@@ -31,7 +31,7 @@ ALL.RESULTS <- F
 
 ##initial year, variables are initialised at 2000 so unless initialisation is modified don't change
 year <- 2000
-t.diff <- 10
+t.diff <- 10 ## do not change, it is the time difference of the parameters calibration
 
 ##species to study
 sp.list <- read.csv2("./IPM/lista_especies_v2.csv",header = T,stringsAsFactors = F)
@@ -46,7 +46,7 @@ quercus <- c(11,12,13,14,15,16)
 
 ## adult trees discretization parameters
 min.DBH <- 7.5  # in cm.
-n.intervals.mesh <- 4000 ##Discretization DBH
+n.intervals.mesh <- 2000 ##Discretization DBH
 x <- x.per.species(min.dbh=min.DBH,n.intervals=n.intervals.mesh)
 y <- x
 x2 <- (x/200)^2

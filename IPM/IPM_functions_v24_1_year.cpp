@@ -94,7 +94,7 @@ void IPMpdfTreeGrowthCpp(NumericVector x, NumericVector y, NumericVector param, 
 // [[Rcpp::export]]
 NumericVector IPMadultSurvivalTimesGrowthCpp(NumericVector ntrees, NumericVector x, NumericVector y, NumericVector param_survival, NumericVector param_growth, int t_diff, double max_diam, double h, int nx){
 
-  NumericVector q = ntrees* IPMprobSurvivalCpp(x,param_survival);//q(ntrees.size(), 1);
+  NumericVector q = ntrees;//* IPMprobSurvivalCpp(x,param_survival);//q(ntrees.size(), 1);
 
   NumericMatrix ipm_growth(ntrees.size(),ntrees.size());
   
@@ -113,10 +113,7 @@ NumericVector IPMadultSurvivalTimesGrowthCpp(NumericVector ntrees, NumericVector
 
 // [[Rcpp::export]]
 NumericVector IPMIngrowthIdentityCpp(NumericVector y, NumericVector param){
-  double scale = (1/param[0]);
-  NumericVector gamma_d = dgamma(y,1/10, scale);
-  //printf("gamma 1: %f \n", gamma_d[0]);
-  return (gamma_d*param[1]/10);
+  return (param[0]*exp(-y*param[0])*param[1])/10;
 }
 
 // [[Rcpp::export]]

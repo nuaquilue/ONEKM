@@ -14,6 +14,10 @@ land.dyn.mdl <- function(scn.name){
   })
   options(fftempdir = "./")
 
+  ##load global parameters (climate scenario and modules to be active)
+  source("./mdl_interface/global_parameters.r")
+
+  if (MEDFIRE){
   ##Medfire functions
   source("Medfire/mdl/update.clim.r")
   source("Medfire/mdl/update.interface.r")
@@ -28,24 +32,21 @@ land.dyn.mdl <- function(scn.name){
   source("Medfire/mdl/post.fire.r")
   source("Medfire/mdl/auxiliars.r")
   sourceCpp("Medfire/mdl/is.in.cpp")
+  }
 
   ##IPM functions
-  source("./IPM/auxiliary_functions_v10 - Roberto.R")
-  source("./IPM/IPM_functions_v20_old.R")
-  source("./mdl_interface/build.var.IPM.r")
-  source("./mdl_interface/read_IPM_age.r")
-  sourceCpp("./IPM/IPM_functions_v23_1_Year.cpp")
-  
-  ##To avoid library clashes
-  select <- dplyr::select
-  
-  ##load global parameters (climate scenario and modules to be active)
-  source("./mdl_interface/global_parameters.r")
-
-  if(IPM){
+  if (IPM) {
+	  source("./IPM/auxiliary_functions_v10 - Roberto.R")
+	  source("./IPM/IPM_functions_v20_old.R")
+	  source("./mdl_interface/build.var.IPM.r")
+	  source("./mdl_interface/read_IPM_age.r")
+	  sourceCpp("./IPM/IPM_functions_v22_1_Year.cpp")
 	  ##IPM global variables and parameters
 	  source(paste0("mdl_interface/IPM_parameters.r"))
   }
+  
+  ##To avoid library clashes
+  select <- dplyr::select
 	  
   time.seq <- seq(-9, time.horizon, 1) # From -9 to 0 runs IPM from 2000 to 2009
   
@@ -86,7 +87,7 @@ land.dyn.mdl <- function(scn.name){
 	    clim.schedule <- seq(1, time.horizon-1, clim.step)
 	  lchg.schedule <- seq(1, time.horizon, lchg.step)
 	  fmgmt.schedule <- seq(1, time.horizon, fmgmt.step)
-	  fire.schedule <- seq(-9, time.horizon, fire.step) #burns IPM
+	  fire.schedule <- seq(1, time.horizon, fire.step) #burns IPM
 	  pb.schedule <- seq(1, time.horizon, pb.step)
 	  drought.schedule <- seq(1, time.horizon, drought.step)
 	  post.fire.schedule <- seq(1, time.horizon, post.fire.step)
@@ -153,7 +154,7 @@ land.dyn.mdl <- function(scn.name){
 	    cat("building age variable\n")
 	  	load(orig.plots.age.file)
 	  }
-    cat("IPM age loaded\n")
+      cat("IPM age loaded\n")
 	  if(testing){
 	  	 ##select a smaller number of cells within Barcelona
 		 ini_cells <- c()
@@ -171,13 +172,13 @@ land.dyn.mdl <- function(scn.name){
 		 IPM.forest.age <- IPM.forest.age[ini_cells,]
 		 adult.trees<- lapply(adult.trees, function(x) {x[ini_cells,]})
 		 
-		 # NUM_PLOTS <- 11
-		 # target<-c(9,10,25,30,77,79,81,90,93,94,96)
-		 # map <- map[target,]
-		 # ba <- ba[target,]
-		 # saplings <- saplings[target,]
-		 # IPM.forest.age <- IPM.forest.age[target,]
-		 # adult.trees<- lapply(adult.trees, function(x) {x[target,]})
+		 NUM_PLOTS <- 2
+		 target<-c(1,2)
+		 map <- map[target,]
+		 ba <- ba[target,]
+		 saplings <- saplings[target,]
+		 IPM.forest.age <- IPM.forest.age[target,]
+		 adult.trees<- lapply(adult.trees, function(x) {x[target,]})
 	  }
 
     
@@ -342,15 +343,17 @@ land.dyn.mdl <- function(scn.name){
         fire.ids <- integer()
         id.fire <- annual.burnt <- 0
         if(processes[fire.id] & t %in% temp.fire.schedule){
-          if(iyear < 2019){
+          if(iyear < 2019 & burn.hist.fires){
           	hist_fires <- raster(paste0("./Medfire/historic_fires/Fires_",iyear,".TIF"))
           	burnt.cells <- which(!is.na(hist_fires[]))
+          	if (year>=2010){
           	land$tsdist[land$cell.id %in% burnt.cells] <- 0
             land$tburnt[land$cell.id %in% burnt.cells] <- land$tburnt[land$cell.id %in% burnt.cells] + 1
             land$distype[land$cell.id %in% burnt.cells] <- hfire
             #land$distype[land$cell.id %in% burnt.cells[!burnt.intens]] <- lfire
             land$age[land$cell.id %in% burnt.cells[burnt.intens]] <- 0
             land$biom[land$cell.id %in% burnt.cells[burnt.intens]] <- 0
+        	}
           } else{
 	          pigni <- prob.igni(land, orography, clim, interface)
 	          # Decide climatic severity of the year (default is mild)
@@ -382,13 +385,12 @@ land.dyn.mdl <- function(scn.name){
 	          land$tburnt[land$cell.id %in% burnt.cells] <- land$tburnt[land$cell.id %in% burnt.cells] + 1
 	          land$distype[land$cell.id %in% burnt.cells[burnt.intens]] <- hfire
 	          land$distype[land$cell.id %in% burnt.cells[!burnt.intens]] <- lfire
-	          land$age[land$cell.id %in% burnt.cells[burnt.intens]] <- 0
 	          land$biom[land$cell.id %in% burnt.cells[burnt.intens]] <- 0
 	          land$biom[land$cell.id %in% burnt.cells[!burnt.intens]] <- 
 	            land$biom[land$cell.id %in% burnt.cells[!burnt.intens]]*(1-fintensity[!burnt.intens])
           }
           temp.fire.schedule <- temp.fire.schedule[-1] 
-          rm(fire.out)
+          rm(fire.out); rm(aux)
         }
       }
       
@@ -485,8 +487,10 @@ land.dyn.mdl <- function(scn.name){
               clim$sqi[clim$cell.id %in% aux$cell.id] <- aux$sqi
               track.post.fire <- rbind(track.post.fire, data.frame(run=irun, year=t, table(spp.out, aux$spp)))  
             }
-            rm(aux) 
+            # Reset age of cells burnt in high intensity
+        	land$age[land$cell.id %in% burnt.cells[burnt.intens] & !is.na(land$spp) & land$spp<=14] <- 0
             temp.post.fire.schedule <- temp.post.fire.schedule[-1] 
+        	rm(aux); rm(spp.out)
         	if(IPM.post.fire){
         		## LCT is updated yearly for cell that have been burnt at least once
         		IPM.burnt.plots.indexes <- which(map$Medfire.id %in% land[land$tburnt>0,cell.id])
@@ -651,6 +655,7 @@ land.dyn.mdl <- function(scn.name){
                        summarise(area=length(biom), vol=sum(biom), volbark=0, carbon=0)  
           track.land <- rbind(track.land, data.frame(run=irun, year=t, aux), data.frame(run=irun, year=t, aux.shrub))
           temp.growth.schedule <- temp.growth.schedule[-1] 
+          rm(aux); rm(aux.shrub)
         }
       }
 
@@ -713,7 +718,7 @@ land.dyn.mdl <- function(scn.name){
                   adult.trees[[j]][i,] <- dummy
                   
                   ##Calculate newsaplings 
-                  if (iyear>2009){
+                  if (iyear>=2009){
                     if (IPM.forest.age[i,j]>29){
                       p.sapl <- c(param.sapl1[j],param.sapl2[j])
                       #careful with the saplings prediction. If not controlled, it can both explode and drop below 0
@@ -755,6 +760,7 @@ land.dyn.mdl <- function(scn.name){
                     if(sapl[j] > 0 & (!BASAL.AREA.THRESHOLD | (sum(ba[i,]) < BA_threshold$perc_95[j])) & IPM.forest.age[i,j]>9){
   
                       dummy <- IPMIngrowthIdentityCpp(y[,j],c(param.ingrowth1[j],param.ingrowth2[j]))
+                      #dummy <- dgamma(y[,j],1/10, rate=param.ingrowth1[j])*(param.ingrowth2[j]/10)
                       adult.trees[[j]][i,] <- adult.trees[[j]][i,] + dummy
   
                       if(ALL.RESULTS){
@@ -794,6 +800,7 @@ land.dyn.mdl <- function(scn.name){
       ##SAVE RESULTS
       if(IPM){
         if(save.IPM.variables){
+        cat(paste0("Saving IPM variables year:", iyear, "\n"))
         adult.trees.file <- paste0("./mdl_interface/output/trees_",scn.name, "_", iyear, "_", "run_",irun, ".rdata")
         ba.file <- paste0("./mdl_interface/output/ba_",scn.name, "_", iyear, "_", "run_",irun, ".rdata")
         saplings.file <- paste0("./mdl_interface/output/saplings_",scn.name, "_", iyear, "_", "run_",irun, ".rdata")
@@ -804,20 +811,20 @@ land.dyn.mdl <- function(scn.name){
         }
       }
       
-      if(MEDFIRE){
-        ## Print maps every time step with ignition and low/high intenstiy burnt
-        if(write.sp.outputs){
-          MAP <- MASK
-          cat("... writing output layers", "\n")
-          nfire <- sum(track.fire$year==t, na.rm=T)
-          sizes <- filter(track.fire, year==t) %>% group_by(swc, fire.id) %>% summarise(ab=aburnt.highintens+aburnt.lowintens)
-          # Ignitions' cell.id 
-          igni.id <- burnt.cells[c(1,cumsum(sizes$ab)[1:(nfire-1)]+1)] 
-          MAP[!is.na(MASK[])] <- land$distype*(land$tsdist==1)
-          MAP[igni.id] <- 9
-          writeRaster(MAP, paste0(out.path, "/lyr/DistType_r", irun, "t", t, ".tif"), format="GTiff", overwrite=T)
-        }
-      }
+      # if(MEDFIRE){
+      #   ## Print maps every time step with ignition and low/high intenstiy burnt
+      #   if(write.sp.outputs){
+      #     MAP <- MASK
+      #     cat("... writing output layers", "\n")
+      #     nfire <- sum(track.fire$year==t, na.rm=T)
+      #     sizes <- filter(track.fire, year==t) %>% group_by(swc, fire.id) %>% summarise(ab=aburnt.highintens+aburnt.lowintens)
+      #     # Ignitions' cell.id 
+      #     igni.id <- burnt.cells[c(1,cumsum(sizes$ab)[1:(nfire-1)]+1)] 
+      #     MAP[!is.na(MASK[])] <- land$distype*(land$tsdist==1)
+      #     MAP[igni.id] <- 9
+      #     writeRaster(MAP, paste0(out.path, "/lyr/DistType_r", irun, "t", t, ".tif"), format="GTiff", overwrite=T)
+      #   }
+      # }
 
       iyear <- iyear +1
       ## Deallocate memory
