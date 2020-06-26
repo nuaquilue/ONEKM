@@ -46,7 +46,7 @@ quercus <- c(11,12,13,14,15,16)
 
 ## adult trees discretization parameters
 min.DBH <- 7.5  # in cm.
-n.intervals.mesh <- 2000 ##Discretization DBH
+n.intervals.mesh <- 5000 ##Discretization DBH
 x <- x.per.species(min.dbh=min.DBH,n.intervals=n.intervals.mesh)
 y <- x
 x2 <- (x/200)^2

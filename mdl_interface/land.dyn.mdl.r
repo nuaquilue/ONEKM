@@ -172,13 +172,13 @@ land.dyn.mdl <- function(scn.name){
 		 IPM.forest.age <- IPM.forest.age[ini_cells,]
 		 adult.trees<- lapply(adult.trees, function(x) {x[ini_cells,]})
 		 
-		 NUM_PLOTS <- 2
-		 target<-c(1,2)
-		 map <- map[target,]
-		 ba <- ba[target,]
-		 saplings <- saplings[target,]
-		 IPM.forest.age <- IPM.forest.age[target,]
-		 adult.trees<- lapply(adult.trees, function(x) {x[target,]})
+		 # NUM_PLOTS <- 2
+		 # target<-c(1,2)
+		 # map <- map[target,]
+		 # ba <- ba[target,]
+		 # saplings <- saplings[target,]
+		 # IPM.forest.age <- IPM.forest.age[target,]
+		 # adult.trees<- lapply(adult.trees, function(x) {x[target,]})
 	  }
 
     
