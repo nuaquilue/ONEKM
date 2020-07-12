@@ -14,12 +14,12 @@ map.csv <- "MAP_BCN_v1.csv"
 
 # set the scenario
 source("Medfire/mdl/define.scenario.r")
-scn.name <- "test_coupled_1y"
+scn.name <- "test_only_medfire_3"
 define.scenario(scn.name)
 
 
 #run coupled
-scn.name <- "growth_death_ingrowth_2000"
+scn.name <- "g.d.i_100_plots_5000"
 source("mdl_interface/land.dyn.mdl.r")
 system.time(land.dyn.mdl(scn.name))
 
