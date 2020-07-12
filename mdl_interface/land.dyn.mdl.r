@@ -48,7 +48,7 @@ land.dyn.mdl <- function(scn.name){
   ##To avoid library clashes
   select <- dplyr::select
 	  
-  time.seq <- seq(-9, time.horizon, 1) # From -9 to 0 runs IPM from 2000 to 2009
+  time.seq <- seq(-9, time.horizon-10, 1) # From -9 to 0 runs IPM from 2000 to 2009
   
   if(MEDFIRE){
 	  ## Load scenario definition (global variables and scenario parameters)
@@ -87,7 +87,7 @@ land.dyn.mdl <- function(scn.name){
 	    clim.schedule <- seq(1, time.horizon-1, clim.step)
 	  lchg.schedule <- seq(1, time.horizon, lchg.step)
 	  fmgmt.schedule <- seq(1, time.horizon, fmgmt.step)
-	  fire.schedule <- seq(1, time.horizon, fire.step) #burns IPM
+	  fire.schedule <- seq(-9, time.horizon, fire.step) #burns IPM
 	  pb.schedule <- seq(1, time.horizon, pb.step)
 	  drought.schedule <- seq(1, time.horizon, drought.step)
 	  post.fire.schedule <- seq(1, time.horizon, post.fire.step)
@@ -344,8 +344,10 @@ land.dyn.mdl <- function(scn.name){
         id.fire <- annual.burnt <- 0
         if(processes[fire.id] & t %in% temp.fire.schedule){
           if(iyear < 2019 & burn.hist.fires){
+          	cat("Analysing historic burnts \n")
           	hist_fires <- raster(paste0("./Medfire/historic_fires/Fires_",iyear,".TIF"))
           	burnt.cells <- which(!is.na(hist_fires[]))
+          	burnt.intens <- rep(T, length(burnt.cells)) ##assumes all fires have high intensity but it should be cheked!
           	if (year>=2010){
           	land$tsdist[land$cell.id %in% burnt.cells] <- 0
             land$tburnt[land$cell.id %in% burnt.cells] <- land$tburnt[land$cell.id %in% burnt.cells] + 1
@@ -354,7 +356,7 @@ land.dyn.mdl <- function(scn.name){
             land$age[land$cell.id %in% burnt.cells[burnt.intens]] <- 0
             land$biom[land$cell.id %in% burnt.cells[burnt.intens]] <- 0
         	}
-          } else{
+          } else if (year>=2010){
 	          pigni <- prob.igni(land, orography, clim, interface)
 	          # Decide climatic severity of the year (default is mild)
 	          clim.sever <- 0
@@ -388,9 +390,10 @@ land.dyn.mdl <- function(scn.name){
 	          land$biom[land$cell.id %in% burnt.cells[burnt.intens]] <- 0
 	          land$biom[land$cell.id %in% burnt.cells[!burnt.intens]] <- 
 	            land$biom[land$cell.id %in% burnt.cells[!burnt.intens]]*(1-fintensity[!burnt.intens])
+
+              rm(fire.out); rm(aux)
           }
           temp.fire.schedule <- temp.fire.schedule[-1] 
-          rm(fire.out); rm(aux)
         }
       }
       

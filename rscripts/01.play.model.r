@@ -14,7 +14,7 @@ map.csv <- "MAP_BCN_v1.csv"
 
 # set the scenario
 source("Medfire/mdl/define.scenario.r")
-scn.name <- "test_only_medfire_2"
+scn.name <- "test_coupled_1y"
 define.scenario(scn.name)
 
 

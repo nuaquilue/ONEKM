@@ -38,7 +38,7 @@ define.scenario <- function(scn.name){
                  FALSE,  # 8. Cohort establihsment
                  FALSE,  # 9. Afforestation
                  TRUE)   # 10. Growth
-  burn.hist.fires <- FALSE
+  burn.hist.fires <- TRUE
   ##We want inputs from IPM?
   IPM.post.fire <- FALSE
   IPM.afforestation <- FALSE

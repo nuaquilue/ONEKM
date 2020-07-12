@@ -1,16 +1,16 @@
 ##IPM-Medfire global variables
 IPM <- T
-MEDFIRE <- F
+MEDFIRE <- T
 
-## Time lenght (in years) of a model simulation, from 2010 to 2100
-time.horizon <- 90
+## Time lenght (in years) of a model simulation, from 2000 to 2100 
+time.horizon <- 1
 
 clim.scn <- "rcp45"
 clim.mdl <- "SMHI-RCA4_MOHC-HadGEM2-ES"
 
 
 nrun <- 1
-testing <- T
+testing <- F
 work.path <- "C:/Users/uriso/Desktop/ONEKM" #Laptop oriol
 #work.path <- "C:/Users/Administrator/Oriol/ONEKM" #remote brotons lab
 ##Species interface vectors	                  
