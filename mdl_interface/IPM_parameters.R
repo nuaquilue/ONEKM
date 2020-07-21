@@ -72,16 +72,37 @@ MAXDBH[15] <- 161.7  # Quercus suber
 MAXDBH[16] <- 114.84   # Sclerophyllous
 
 ##IPM parameters
-survival.coef <- load.survival("survival_v8",newspecies)
-growth.coef <- load.growth("growth_v6",newspecies)
-ingrowth.coef <- load.ingrowth("ingrowth_v10",newspecies)
-saplings.coef <- load.saplings("recruitment_regression_v15",newspecies)
-param.survival1 <- survival.coef$log.dbh
-param.growth1 <- growth.coef$log.dbh
-param.growth3 <- growth.coef$intercept.variance
-param.growth4 <- growth.coef$slope.variance
-param.sapl1 <- saplings.coef$binom
-param.ingrowth1 <- ingrowth.coef$lambda
+if(file.exists("./mdl_interface/params_IPM.rdata")){
+  load("./mdl_interface/params_IPM.rdata")
+  cat("IPM parameters loaded \n")
+  param.survival1 <- params.IPM[[1]]
+  param.growth1 <- params.IPM[[2]]
+  param.growth3 <- params.IPM[[3]]
+  param.growth4 <- params.IPM[[4]]
+  param.sapl1 <- params.IPM[[5]]
+  param.ingrowth1 <- params.IPM[[6]]
+} else{
+  survival.coef <- load.survival("survival_v8",newspecies)
+  growth.coef <- load.growth("growth_v6",newspecies)
+  ingrowth.coef <- load.ingrowth("ingrowth_v10",newspecies)
+  saplings.coef <- load.saplings("recruitment_regression_v15",newspecies)
+  param.survival1 <- survival.coef$log.dbh
+  param.growth1 <- growth.coef$log.dbh
+  param.growth3 <- growth.coef$intercept.variance
+  param.growth4 <- growth.coef$slope.variance
+  param.sapl1 <- saplings.coef$binom
+  param.ingrowth1 <- ingrowth.coef$lambda
+  
+  params.IPM <- list()
+  params.IPM[[1]]<- param.survival1
+  params.IPM[[2]] <- param.growth1
+  params.IPM[[3]] <- param.growth3
+  params.IPM[[4]] <- param.growth4
+  params.IPM[[5]] <- param.sapl1
+  params.IPM[[6]] <- param.ingrowth1
+  save(params.IPM, file="./mdl_interface/params_IPM.rdata")
+}
+
 
 ## Colonization parameters
 ingrowth <- T
