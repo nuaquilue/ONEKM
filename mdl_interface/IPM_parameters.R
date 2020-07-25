@@ -1,4 +1,4 @@
-source(paste0(work.path,"/mdl_interface/select.valid.plots.r"))
+source("./mdl_interface/select.valid.plots.R")
 cat("Initializing IPM parameters", "\n")
 
 ##study area
@@ -75,12 +75,17 @@ MAXDBH[16] <- 114.84   # Sclerophyllous
 if(file.exists("./mdl_interface/params_IPM.rdata")){
   load("./mdl_interface/params_IPM.rdata")
   cat("IPM parameters loaded \n")
-  param.survival1 <- params.IPM[[1]]
-  param.growth1 <- params.IPM[[2]]
-  param.growth3 <- params.IPM[[3]]
-  param.growth4 <- params.IPM[[4]]
-  param.sapl1 <- params.IPM[[5]]
-  param.ingrowth1 <- params.IPM[[6]]
+  survival.coef <- params.IPM[[1]]
+  growth.coef <- params.IPM[[2]]
+  ingrowth.coef <- params.IPM[[3]]
+  saplings.coef <- params.IPM[[4]]
+  param.survival1 <- survival.coef$log.dbh
+  param.growth1 <- growth.coef$log.dbh
+  param.growth3 <- growth.coef$intercept.variance
+  param.growth4 <- growth.coef$slope.variance
+  param.sapl1 <- saplings.coef$binom
+  param.ingrowth1 <- ingrowth.coef$lambda
+  
 } else{
   survival.coef <- load.survival("survival_v8",newspecies)
   growth.coef <- load.growth("growth_v6",newspecies)
@@ -94,12 +99,10 @@ if(file.exists("./mdl_interface/params_IPM.rdata")){
   param.ingrowth1 <- ingrowth.coef$lambda
   
   params.IPM <- list()
-  params.IPM[[1]]<- param.survival1
-  params.IPM[[2]] <- param.growth1
-  params.IPM[[3]] <- param.growth3
-  params.IPM[[4]] <- param.growth4
-  params.IPM[[5]] <- param.sapl1
-  params.IPM[[6]] <- param.ingrowth1
+  params.IPM[[1]]<- survival.coef
+  params.IPM[[2]] <- growth.coef
+  params.IPM[[3]] <- ingrowth.coef
+  params.IPM[[4]] <- saplings.coef
   save(params.IPM, file="./mdl_interface/params_IPM.rdata")
 }
 

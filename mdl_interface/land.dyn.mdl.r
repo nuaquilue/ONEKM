@@ -15,7 +15,7 @@ land.dyn.mdl <- function(scn.name){
   options(fftempdir = "./")
 
   ##load global parameters (climate scenario and modules to be active)
-  source("./mdl_interface/global_parameters.r")
+  source("mdl_interface/global_parameters.R")
 
   if (MEDFIRE){
   ##Medfire functions
@@ -38,11 +38,11 @@ land.dyn.mdl <- function(scn.name){
   if (IPM) {
 	  source("./IPM/auxiliary_functions_v10 - Roberto.R")
 	  source("./IPM/IPM_functions_v20_old.R")
-	  source("./mdl_interface/build.var.IPM.r")
-	  source("./mdl_interface/read_IPM_age.r")
-	  sourceCpp("./IPM/IPM_functions_v22_1_Year.cpp")
+	  source("./mdl_interface/build.var.IPM.R")
+	  source("./mdl_interface/read_IPM_age.R")
+	  sourceCpp("./IPM/IPM_functions_v22_1_Year_par.cpp")
 	  ##IPM global variables and parameters
-	  source(paste0("mdl_interface/IPM_parameters.r"))
+	  source("./mdl_interface/IPM_parameters.R")
   }
   
   ##To avoid library clashes
@@ -345,13 +345,13 @@ land.dyn.mdl <- function(scn.name){
         if(processes[fire.id] & t %in% temp.fire.schedule){
           if(iyear < 2019 & burn.hist.fires){
           	cat("Analysing historic burnts \n")
-          	hist_fires <- raster(paste0("./Medfire/historic_fires/Fires_",iyear,".TIF"))
+          	hist_fires <- raster(paste0("./Medfire/historic_fires/Fires_",iyear,".tif"))
           	burnt.cells <- which(!is.na(hist_fires[]))
           	burnt.intens <- rep(T, length(burnt.cells)) ##assumes all fires have high intensity but it should be cheked!
-          	if (year>=2010){
           	land$tsdist[land$cell.id %in% burnt.cells] <- 0
-            land$tburnt[land$cell.id %in% burnt.cells] <- land$tburnt[land$cell.id %in% burnt.cells] + 1
-            land$distype[land$cell.id %in% burnt.cells] <- hfire
+          	land$tburnt[land$cell.id %in% burnt.cells] <- land$tburnt[land$cell.id %in% burnt.cells] + 1
+          	land$distype[land$cell.id %in% burnt.cells] <- hfire
+          	if (year>=2010){
             #land$distype[land$cell.id %in% burnt.cells[!burnt.intens]] <- lfire
             land$age[land$cell.id %in% burnt.cells[burnt.intens]] <- 0
             land$biom[land$cell.id %in% burnt.cells[burnt.intens]] <- 0
@@ -464,7 +464,7 @@ land.dyn.mdl <- function(scn.name){
                 adult.trees[[s]][burnt.cells.IPM.index,]<-0
               } #for species 
             ba[burnt.cells.IPM.index,]<-0
-            IPM.forest.age[burnt.cells.IPM.index]<-0
+            IPM.forest.age[burnt.cells.IPM.index,]<-0
           } # if  there are high intensity burnt cells
           ##low intensity burnt cells
           low.intensity.burnt <- burnt.cells[!burnt.intens]
@@ -804,16 +804,19 @@ land.dyn.mdl <- function(scn.name){
       if(IPM){
         if(save.IPM.variables){
         cat(paste0("Saving IPM variables year:", iyear, "\n"))
-        adult.trees.file <- paste0("./mdl_interface/output/trees_",scn.name, "_", iyear, "_", "run_",irun, ".rdata")
-        ba.file <- paste0("./mdl_interface/output/ba_",scn.name, "_", iyear, "_", "run_",irun, ".rdata")
-        saplings.file <- paste0("./mdl_interface/output/saplings_",scn.name, "_", iyear, "_", "run_",irun, ".rdata")
+        adult.trees.file <- paste0("./mdl_interface/output/",scn.name,"/trees_",scn.name, "_", iyear, "_", "run_",irun, ".rdata")
+        ba.file <- paste0("./mdl_interface/output/",scn.name,"/ba_",scn.name, "_", iyear, "_", "run_",irun, ".rdata")
+        saplings.file <- paste0("./mdl_interface/output/", scn.name, "/saplings_",scn.name, "_", iyear, "_", "run_",irun, ".rdata")
         save(adult.trees, file=adult.trees.file)
         save(ba, file=ba.file)
         save(saplings, file=saplings.file)
         #save(IPM.forest.age, file=IPM.forest.age.file)
         }
       }
-      
+      if (MEDFIRE){
+        land.file <- paste0("./mdl_interface/output/",scn.name,"/land_",scn.name, "_", iyear, "_", "run_",irun, ".rdata")
+        save(land, file=land.file)
+      } 
       # if(MEDFIRE){
       #   ## Print maps every time step with ignition and low/high intenstiy burnt
       #   if(write.sp.outputs){
