@@ -348,13 +348,14 @@ land.dyn.mdl <- function(scn.name){
           	hist_fires <- raster(paste0("./Medfire/historic_fires/Fires_",iyear,".tif"))
           	burnt.cells <- which(!is.na(hist_fires[]))
           	burnt.intens <- rep(T, length(burnt.cells)) ##assumes all fires have high intensity but it should be cheked!
-          	land$tsdist[land$cell.id %in% burnt.cells] <- 0
-          	land$tburnt[land$cell.id %in% burnt.cells] <- land$tburnt[land$cell.id %in% burnt.cells] + 1
-          	land$distype[land$cell.id %in% burnt.cells] <- hfire
           	if (year>=2010){
-            #land$distype[land$cell.id %in% burnt.cells[!burnt.intens]] <- lfire
-            land$age[land$cell.id %in% burnt.cells[burnt.intens]] <- 0
-            land$biom[land$cell.id %in% burnt.cells[burnt.intens]] <- 0
+          		##Only change Medfire land variable if year >=2010
+	            land$age[land$cell.id %in% burnt.cells[burnt.intens]] <- 0
+	            land$biom[land$cell.id %in% burnt.cells[burnt.intens]] <- 0
+	            land$tsdist[land$cell.id %in% burnt.cells] <- 0
+	          	land$tburnt[land$cell.id %in% burnt.cells] <- land$tburnt[land$cell.id %in% burnt.cells] + 1
+	          	land$distype[land$cell.id %in% burnt.cells] <- hfire
+	          	#land$distype[land$cell.id %in% burnt.cells[!burnt.intens]] <- lfire
         	}
           } else if (year>=2010){
 	          pigni <- prob.igni(land, orography, clim, interface)
@@ -621,7 +622,7 @@ land.dyn.mdl <- function(scn.name){
       ## Track colonized plots LCT evolution of all the cells that have IPM plots
       if(MEDFIRE){
       	if(IPM.afforestation){
-      		IPM.colonized.plots.indexes <- which(map$Medfire.id %in% land[land$distype==afforest,cell.id])
+      		IPM.colonized.plots.indexes <- which(map$Medfire.id %in% land$cell.id[land$distype==afforest & !is.na(land$distype)])
         		for (col.plot in IPM.colonized.plots.indexes) {
         			if (sum(ba[col.plot,])>0){
         				IPM.spp <- which.max(ba[burnt.plot,])
