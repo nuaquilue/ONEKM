@@ -3,23 +3,24 @@ gc()
 
 ## Change to local directory
 #setwd("C:/Users/uriso/Desktop/ONEKM") #Oriol laptop
-setwd("C:/Users/Administrator/Oriol/ONEKM") #remote Brotons lab
+# setwd("C:/Users/Administrator/Oriol/ONEKM") #remote Brotons lab
+setwd("/home/xrdpuser/Desktop/ONEKM/")
 ## Load required packages and functions 
 library(tidyverse)
 library(sp)
-library(raster)  
-library(RANN)  
+library(raster)
+library(RANN)
 
 map.csv <- "MAP_BCN_v1.csv"
 
 # set the scenario
 source("Medfire/mdl/define.scenario.r")
-scn.name <- "test_only_medfire_3"
+scn.name <- "test_coupled_rem_4"
 define.scenario(scn.name)
 
 
 #run coupled
-scn.name <- "g.d.i_100_plots_5000"
+# scn.name <- "g.d.i_100_plots_5000"
 source("mdl_interface/land.dyn.mdl.r")
 system.time(land.dyn.mdl(scn.name))
 
@@ -31,7 +32,9 @@ system.time(land.dyn.mdl(scn.name))
 source("mdl/read.static.vars.r")
 source("mdl/read.state.vars.r")
 source("mdl/read.climatic.vars.r")
-work.path <- "C:/Users/uriso/Desktop/ONEKM" #oriol laptop
+# work.path <- "C:/Users/uriso/Desktop/ONEKM" #oriol laptop
+work.path<-"/home/xrdpuser/Desktop/ONEKM"
+
 #adapt.climatic.vars(work.path)
 # Create .Rdata with static variables of the model, only run once for all scenarios!
 read.static.vars(work.path)

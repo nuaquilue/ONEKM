@@ -40,7 +40,7 @@ define.scenario <- function(scn.name){
                  TRUE)   # 10. Growth
   burn.hist.fires <- TRUE
   ##We want inputs from IPM?
-  IPM.post.fire <- FALSE
+  IPM.post.fire <- TRUE
   IPM.afforestation <- FALSE
   
   ## Process ID and frequency (in years) 

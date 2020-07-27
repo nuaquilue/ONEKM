@@ -496,7 +496,7 @@ land.dyn.mdl <- function(scn.name){
         	rm(aux); rm(spp.out)
         	if(IPM.post.fire){
         		## LCT is updated yearly for cell that have been burnt at least once
-        		IPM.burnt.plots.indexes <- which(map$Medfire.id %in% land[land$tburnt>0,cell.id])
+        		IPM.burnt.plots.indexes <- which(map$Medfire.id %in% land$cell.id[land$tburnt>0 & !is.na(land$tburnt)])
         		for (burnt.plot in IPM.burnt.plots.indexes) {
         			if (sum(ba[burnt.plot,])>0){
         				IPM.spp <- which.max(ba[burnt.plot,])
