@@ -348,7 +348,7 @@ land.dyn.mdl <- function(scn.name){
           	hist_fires <- raster(paste0("./Medfire/historic_fires/Fires_",iyear,".tif"))
           	burnt.cells <- which(!is.na(hist_fires[]))
           	burnt.intens <- rep(T, length(burnt.cells)) ##assumes all fires have high intensity but it should be cheked!
-          	if (year>=2010){
+          	if (iyear>=2010){
           		##Only change Medfire land variable if year >=2010
 	            land$age[land$cell.id %in% burnt.cells[burnt.intens]] <- 0
 	            land$biom[land$cell.id %in% burnt.cells[burnt.intens]] <- 0
@@ -357,7 +357,7 @@ land.dyn.mdl <- function(scn.name){
 	          	land$distype[land$cell.id %in% burnt.cells] <- hfire
 	          	#land$distype[land$cell.id %in% burnt.cells[!burnt.intens]] <- lfire
         	}
-          } else if (year>=2010){
+          } else if (iyear>=2010){
 	          pigni <- prob.igni(land, orography, clim, interface)
 	          # Decide climatic severity of the year (default is mild)
 	          clim.sever <- 0
