@@ -36,12 +36,12 @@ define.scenario <- function(scn.name){
                  FALSE,  # 6. Drought
                  TRUE,   # 7. Post-fire regeneration
                  FALSE,  # 8. Cohort establihsment
-                 FALSE,  # 9. Afforestation
+                 TRUE,  # 9. Afforestation
                  TRUE)   # 10. Growth
   burn.hist.fires <- TRUE
   ##We want inputs from IPM?
-  IPM.post.fire <- FALSE
-  IPM.afforestation <- FALSE
+  IPM.post.fire <- TRUE
+  IPM.afforestation <- TRUE
   
   ## Process ID and frequency (in years) 
   clim.id <- 1; clim.step <- 10

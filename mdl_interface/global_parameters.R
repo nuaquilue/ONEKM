@@ -1,9 +1,9 @@
 ##IPM-Medfire global variables
-IPM <- F
+IPM <- T
 MEDFIRE <- T
 
 ## Time lenght (in years) of a model simulation, from 2000 to 2100 
-time.horizon <- 35
+time.horizon <- 25
 
 clim.scn <- "rcp45"
 clim.mdl <- "SMHI-RCA4_MOHC-HadGEM2-ES"
