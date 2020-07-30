@@ -48,7 +48,7 @@ land.dyn.mdl <- function(scn.name){
   ##To avoid library clashes
   select <- dplyr::select
 	  
-  time.seq <- seq(-9, time.horizon-10, 1) # From -9 to 0 runs IPM from 2000 to 2009
+  time.seq <- seq(1, time.horizon, 1) # From -9 to 0 runs IPM from 2000 to 2009
   
   if(MEDFIRE){
 	  ## Load scenario definition (global variables and scenario parameters)
@@ -92,7 +92,7 @@ land.dyn.mdl <- function(scn.name){
 	    clim.schedule <- seq(1, time.horizon-1, clim.step)
 	  lchg.schedule <- seq(1, time.horizon, lchg.step)
 	  fmgmt.schedule <- seq(1, time.horizon, fmgmt.step)
-	  fire.schedule <- seq(-9, time.horizon, fire.step) #burns IPM
+	  fire.schedule <- seq(1, time.horizon, fire.step) #burns IPM
 	  pb.schedule <- seq(1, time.horizon, pb.step)
 	  drought.schedule <- seq(1, time.horizon, drought.step)
 	  post.fire.schedule <- seq(1, time.horizon, post.fire.step)
@@ -259,7 +259,7 @@ land.dyn.mdl <- function(scn.name){
     }#if IPM    
     
     
-    iyear <- 2000
+    iyear <- 2010
     ## Start the discrete time sequence 
     for(t in time.seq){
       
@@ -528,7 +528,7 @@ land.dyn.mdl <- function(scn.name){
 						      left_join(site.quality.spp, by = "spp") %>% left_join(site.quality.index, by = "spp") %>% 
 						      mutate(aux=c0+c_mnan*temp+c2_mnan*temp*temp+c_plan*precip+c2_plan*precip*precip+c_aspect*ifelse(aspect!=1,0,1)+c_slope*slope/10) %>%
 						      mutate(sq=1/(1+exp(-1*aux))) %>% mutate(sqi=ifelse(sq<=p50, 1, ifelse(sq<=p90, 2, 3))) %>%
-						      select(cell.id, spp, temp, precip, biom, age, sdm, sqi)
+						      select(cell.id, spp, temp, precip, sqi)
 				sqi.shrub <- filter(Medfire.burnt.plots, spp==14) %>% select(spp, temp, precip) %>% left_join(site.quality.shrub, by = "spp") %>%
 			      mutate(aux.brolla=c0_brolla+c_temp_brolla*temp+c_temp2_brolla*temp*temp+c_precip_brolla*precip+c_precip2_brolla*precip*precip,
 			             aux.maquia=c0_maquia+c_temp_maquia*temp+c_temp2_maquia*temp*temp+c_precip_maquia*precip+c_precip2_maquia*precip*precip,
@@ -609,17 +609,19 @@ land.dyn.mdl <- function(scn.name){
       if(MEDFIRE){
         if(processes[afforest.id] & t %in% temp.afforest.schedule){
             aux  <- afforestation(land, coord, orography, clim, sdm)
-            if (IPM & COLONIZATION & IPM.afforestation){
+            if (IPM & COLONIZATION & IPM.afforestation & (length(aux)!=0)){
             	aux <- aux[!(aux$cell.id %in% map$Medfire.id),] ##only colonize cells outside of IPM study area
             }
-            land$spp[land$cell.id %in% aux$cell.id] <- aux$spp
-            land$age[land$cell.id %in% aux$cell.id] <- 0
-            land$tsdist[land$cell.id %in% aux$cell.id] <- 0
-            land$distype[land$cell.id %in% aux$cell.id] <- afforest
-            clim$spp[clim$cell.id %in% aux$cell.id] <- aux$spp
-            clim$sdm[clim$cell.id %in% aux$cell.id] <- 1
-            clim$sqi[clim$cell.id %in% aux$cell.id] <- aux$sqi
-            track.afforest <- rbind(track.afforest, data.frame(run=irun, year=t, table(aux$spp)))
+            if (length(aux)!=0){
+              land$spp[land$cell.id %in% aux$cell.id] <- aux$spp
+              land$age[land$cell.id %in% aux$cell.id] <- 0
+              land$tsdist[land$cell.id %in% aux$cell.id] <- 0
+              land$distype[land$cell.id %in% aux$cell.id] <- afforest
+              clim$spp[clim$cell.id %in% aux$cell.id] <- aux$spp
+              clim$sdm[clim$cell.id %in% aux$cell.id] <- 1
+              clim$sqi[clim$cell.id %in% aux$cell.id] <- aux$sqi
+              track.afforest <- rbind(track.afforest, data.frame(run=irun, year=t, table(aux$spp)))
+            }
             temp.afforest.schedule <- temp.afforest.schedule[-1] 
 	        if(IPM.afforestation){
 	        	##Update state values of plots colonized by IPM
@@ -653,7 +655,7 @@ land.dyn.mdl <- function(scn.name){
 						      left_join(site.quality.spp, by = "spp") %>% left_join(site.quality.index, by = "spp") %>% 
 						      mutate(aux=c0+c_mnan*temp+c2_mnan*temp*temp+c_plan*precip+c2_plan*precip*precip+c_aspect*ifelse(aspect!=1,0,1)+c_slope*slope/10) %>%
 						      mutate(sq=1/(1+exp(-1*aux))) %>% mutate(sqi=ifelse(sq<=p50, 1, ifelse(sq<=p90, 2, 3))) %>%
-						      select(cell.id, spp, temp, precip, biom, age, sdm, sqi)
+						      select(cell.id, spp, temp, precip, sqi)
 				sqi.shrub <- filter(Medfire.col.plots, spp==14) %>% select(spp, temp, precip) %>% left_join(site.quality.shrub, by = "spp") %>%
 			      mutate(aux.brolla=c0_brolla+c_temp_brolla*temp+c_temp2_brolla*temp*temp+c_precip_brolla*precip+c_precip2_brolla*precip*precip,
 			             aux.maquia=c0_maquia+c_temp_maquia*temp+c_temp2_maquia*temp*temp+c_precip_maquia*precip+c_precip2_maquia*precip*precip,

@@ -61,9 +61,15 @@ afforestation <- function(land, coord, orography, clim, sdm){
   
   ## Select species if available
   x <- runif(length(p),0,1)<=p & available.neigh 
+  if(length( which(x==TRUE))==0){
+    return(numeric(0))
+  } else if (length( which(x==TRUE))==1){
+    new.spp <- data.frame(cell.id=coord$cell.id[neigh.id[,1]*x],
+                         spp=select.spp(nneigh[x,]) )
+  } else{
   new.spp <- data.frame(cell.id=coord$cell.id[neigh.id[,1]*x],
                         spp=apply(nneigh[x,], 1, select.spp) )
-  
+  }
   ## Join climatic and orographic variables to compute sq and then sqi
   new.spp <- left_join(new.spp, select(clim, cell.id, temp, precip), by = "cell.id") %>% 
              left_join(select(orography, cell.id, aspect, slope), by = "cell.id") %>%
