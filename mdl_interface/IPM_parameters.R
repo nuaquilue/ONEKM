@@ -109,7 +109,7 @@ if(file.exists("./mdl_interface/params_IPM.rdata")){
 
 ## Colonization parameters
 ingrowth <- T
-COLONIZATION <- F ##do we want colonization?
+COLONIZATION <- T ##do we want colonization?
 max.dist <- 1500 ##meters
 colonization.threshold <- 0.05
 BASAL.AREA.THRESHOLD <- T

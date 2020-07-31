@@ -48,7 +48,7 @@ land.dyn.mdl <- function(scn.name){
   ##To avoid library clashes
   select <- dplyr::select
 	  
-  time.seq <- seq(1, time.horizon, 1) # From -9 to 0 runs IPM from 2000 to 2009
+  time.seq <- seq(-9, time.horizon-10, 1) # From -9 to 0 runs IPM from 2000 to 2009
   
   if(MEDFIRE){
 	  ## Load scenario definition (global variables and scenario parameters)
@@ -92,7 +92,7 @@ land.dyn.mdl <- function(scn.name){
 	    clim.schedule <- seq(1, time.horizon-1, clim.step)
 	  lchg.schedule <- seq(1, time.horizon, lchg.step)
 	  fmgmt.schedule <- seq(1, time.horizon, fmgmt.step)
-	  fire.schedule <- seq(1, time.horizon, fire.step) #burns IPM
+	  fire.schedule <- seq(-9, time.horizon, fire.step) #burns IPM
 	  pb.schedule <- seq(1, time.horizon, pb.step)
 	  drought.schedule <- seq(1, time.horizon, drought.step)
 	  post.fire.schedule <- seq(1, time.horizon, post.fire.step)
@@ -259,7 +259,7 @@ land.dyn.mdl <- function(scn.name){
     }#if IPM    
     
     
-    iyear <- 2010
+    iyear <- 2000
     ## Start the discrete time sequence 
     for(t in time.seq){
       
@@ -590,7 +590,7 @@ land.dyn.mdl <- function(scn.name){
                 else if(i %in% deciduous) my.model <- colonization.glm[[3]]
                 suitable$colonized <- predict(my.model,newdata = suitable,type = "response")
                 suitable$colonized <- ifelse(suitable$colonized > colonization.threshold,1,0)
-                suitable<- suitable[suitable$colonized==1,]
+              #  suitable<- suitable[suitable$colonized==1,]
                 if (nrow(suitable)>0){
 	                k <- match(suitable$ID,map$ID)
 	                colonized.plots.ID <- c(colonized.plots.ID, map$ID[k])
@@ -609,26 +609,28 @@ land.dyn.mdl <- function(scn.name){
       if(MEDFIRE){
         if(processes[afforest.id] & t %in% temp.afforest.schedule){
             aux  <- afforestation(land, coord, orography, clim, sdm)
-            if (IPM & COLONIZATION & IPM.afforestation & (length(aux)!=0)){
-            	aux <- aux[!(aux$cell.id %in% map$Medfire.id),] ##only colonize cells outside of IPM study area
-            }
-            if (length(aux)!=0){
-              land$spp[land$cell.id %in% aux$cell.id] <- aux$spp
-              land$age[land$cell.id %in% aux$cell.id] <- 0
-              land$tsdist[land$cell.id %in% aux$cell.id] <- 0
-              land$distype[land$cell.id %in% aux$cell.id] <- afforest
-              clim$spp[clim$cell.id %in% aux$cell.id] <- aux$spp
-              clim$sdm[clim$cell.id %in% aux$cell.id] <- 1
-              clim$sqi[clim$cell.id %in% aux$cell.id] <- aux$sqi
-              track.afforest <- rbind(track.afforest, data.frame(run=irun, year=t, table(aux$spp)))
-            }
+            if(length(aux)!=0){
+              if (IPM & COLONIZATION & IPM.afforestation){
+              	aux <- aux[!(aux$cell.id %in% map$Medfire.id),] ##only colonize cells outside of IPM study area
+              }
+              if (nrow(aux)>0){
+                land$spp[land$cell.id %in% aux$cell.id] <- aux$spp
+                land$age[land$cell.id %in% aux$cell.id] <- 0
+                land$tsdist[land$cell.id %in% aux$cell.id] <- 0
+                land$distype[land$cell.id %in% aux$cell.id] <- afforest
+                clim$spp[clim$cell.id %in% aux$cell.id] <- aux$spp
+                clim$sdm[clim$cell.id %in% aux$cell.id] <- 1
+                clim$sqi[clim$cell.id %in% aux$cell.id] <- aux$sqi
+                track.afforest <- rbind(track.afforest, data.frame(run=irun, year=t, table(aux$spp)))
+              }
+            }  
             temp.afforest.schedule <- temp.afforest.schedule[-1] 
 	        if(IPM.afforestation){
 	        	##Update state values of plots colonized by IPM
-				land$age[land$cell.id %in% map$Medfire.id[colonized.plots.ID]] <- 0
-				land$tsdist[land$cell.id %in% map$Medfire.id[colonized.plots.ID]] <- 0
-				land$distype[land$cell.id %in% map$Medfire.id[colonized.plots.ID]] <- afforest
-				clim$sdm[land$cell.id %in% map$Medfire.id[colonized.plots.ID]] <- 1
+	          land$age[(land$cell.id %in% map$Medfire.id[map$ID %in% colonized.plots.ID]) & land$spp==14] <- 0
+	          land$tsdist[land$cell.id %in% map$Medfire.id[map$ID %in% colonized.plots.ID]] <- 0
+	          land$distype[land$cell.id %in% map$Medfire.id[map$ID %in% colonized.plots.ID]] <- afforest
+	          clim$sdm[land$cell.id %in% map$Medfire.id[map$ID %in% colonized.plots.ID] & land$spp==14] <- 1
       			## Track LCT evolution of all the cells that have IPM plots that have been colonized at some point
 	      		IPM.colonized.plots.indexes <- which(map$Medfire.id %in% land$cell.id[land$distype==afforest & !is.na(land$distype)])
 	        		for (col.plot in IPM.colonized.plots.indexes) {
@@ -836,7 +838,7 @@ land.dyn.mdl <- function(scn.name){
         adult.trees.file <- paste0("./mdl_interface/output/",scn.name,"/trees_",scn.name, "_", iyear, "_", "run_",irun, ".rdata")
         ba.file <- paste0("./mdl_interface/output/",scn.name,"/ba_",scn.name, "_", iyear, "_", "run_",irun, ".rdata")
         saplings.file <- paste0("./mdl_interface/output/", scn.name, "/saplings_",scn.name, "_", iyear, "_", "run_",irun, ".rdata")
-        save(adult.trees, file=adult.trees.file)
+        if (iyear%%10==0){save(adult.trees, file=adult.trees.file)}  
         save(ba, file=ba.file)
         save(saplings, file=saplings.file)
         #save(IPM.forest.age, file=IPM.forest.age.file)
