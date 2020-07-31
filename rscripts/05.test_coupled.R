@@ -211,3 +211,9 @@ analyse.Medfire.dyn.spp <- function(final.year){
 		}
 	}
 }
+
+analyse.colonization <- function(final.year){
+	for (iyear in  2010:final.year){
+		col.file <- paste("remote_output/", scenario,"/colonized.plots.ID_", iyear, ".rdata",sep="")
+
+}
