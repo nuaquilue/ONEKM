@@ -20,7 +20,7 @@ ini_land <- land
 fire.regeneration <- c(T,T,T,F,T,F,T,F,F,F,T,T,T,T,T,T)
 Medfire.index.IPM.spp<-c(5,6,8,9,7,10,2,12,15,11,11,3,1) #quercus humilis and faginea are classified as the same for IPM
 IPM.index.Medfire.spp <-c(13,13,12,13,1,2,5,3,4,6,11,8,13,13,9,13)
-scenario <- "test_coupled_rem_5"
+scenario <- "test_coupled_rem_6"
 ##Test function to assess if for all burnt cells in Medfire within IPM study area
 ##The cells of IPM are also burnt
 analyse.burnt.IPM.cells <- function(final.year){
@@ -210,4 +210,133 @@ analyse.Medfire.dyn.spp <- function(final.year){
 			}
 		}
 	}
+}
+##IPM to Medfire
+analyse.colonization <- function(final.year){
+	for (iyear in  2010:final.year){
+		col.file <- paste("remote_output/", scenario,"/colonized.plots.ID_", iyear, ".rdata",sep="")
+	  load(col.file) 
+	  land.file <- paste("remote_output/", scenario,"/land_", scenario,"_", iyear, "_run_1.rdata",sep="")
+	  load(land.file)
+	  cat(paste0("Year ", iyear, " - Analysing ", length(colonized.plots.ID), " colonized plots\n"))
+	  col.IPM.index <- which(map$ID %in% colonized.plots.ID)
+	  col.Medfire.cell.id <- land$cell.id[land$cell.id %in% map$Medfire.id[col.IPM.index]]
+	  if (!all(land$tsdist[land$cell.id %in% col.Medfire.cell.id]==1)){
+	    cat(paste0("Medfire does not update tsdist after colonization - year ", iyear))
+	  }
+	  if (!all(land$distype[land$cell.id %in% col.Medfire.cell.id]==10)){
+	    cat(paste0("Medfire does not update disttype after colonization - year ", iyear))
+	  }
+	  
+	  saplings.file <- paste("remote_output/", scenario,"/saplings_", scenario,"_", iyear - 1, "_run_1.rdata",sep="")
+	  load(saplings.file)
+	  ba.file <- paste("remote_output/", scenario,"/ba_", scenario,"_", iyear - 1, "_run_1.rdata",sep="")
+	  load(ba.file)
+	  new.col.cells <- which(apply(ba[col.IPM.index,],1,sum)==0 & apply(saplings[col.IPM.index,],1,sum)==0)
+	  new.col.Medfire.cell.id <- land$cell.id[land$cell.id %in% map$Medfire.id[col.IPM.index[new.col.cells]]]
+	  # if (!all(land$age[land$cell.id %in% new.col.Medfire.cell.id]==1)){
+	  #   cat(paste0("Medfire does not update age after new colonized cells - year ", iyear))
+	  # } ## only active if initial shurb IPM same as initial shrub Medfire
+	  for (j in 0:floor((2089-iyear)/10)){
+	    land.file <- paste("remote_output/", scenario,"/land_", scenario,"_", iyear+10*j, "_run_1.rdata",sep="")
+	    load(land.file)
+	    saplings.file <- paste("remote_output/", scenario,"/saplings_", scenario,"_", iyear+10*j, "_run_1.rdata",sep="")
+	    load(saplings.file)
+	    ba.file <- paste("remote_output/", scenario,"/ba_", scenario,"_", iyear+10*j, "_run_1.rdata",sep="")
+	    load(ba.file)
+	    curr_ba <- ba
+	    ba.file <- paste("remote_output/", scenario,"/ba_", scenario,"_", iyear+10*j - 1, "_run_1.rdata",sep="")
+	    load(ba.file)
+	    prev_ba <- ba
+	    ba_tot<-0
+	    sapl_tot<-0
+	    for (i in col.IPM.index){
+	      if (sum(prev_ba[i,])!=0 & sum(curr_ba[i,])!=0){
+	        ba_tot <- ba_tot +1 
+	        if (land$spp[land$cell.id == map$Medfire.id[i]] != IPM.index.Medfire.spp[which.max(prev_ba[i,])]){
+	          cat(paste0("Medfire does not track IPM spp cell with ba>0 ", i, " year ", j, " \n"))
+	        }
+	      }
+	      else if (sum(saplings[i,])!=0){
+	        sapl_tot <- sapl_tot +1
+	        if(land$spp[land$cell.id == map$Medfire.id[i]] != IPM.index.Medfire.spp[which.max(saplings[i,])])
+	          cat(paste0("Medfire does not track IPM spp cell with saplings>0 ", i, " year ", j, " \n"))
+	      }
+	      else if (land$spp[land$cell.id == map$Medfire.id[i]] != 14){
+	        cat(paste0("Medfire does not track IPM spp empty cell ", i, " year ", j, " \n"))
+	      }
+	    }#for col cell
+	    #print(paste0("ba tot: ", ba_tot, " sapl tot: ", sapl_tot))
+	 }# for future year
+  }# for current year
+}
+
+##Redo above functions for 90 years and colonization
+##Make sure that colonized cells info pass to Medfire
+##
+ini_ba_col <- ini_ba[which(map$ID %in% colonized.plots.ID),]
+length(which(apply(ini_ba_col,1,sum)==0))
+
+
+##Medfire post fire regeneration just after fire, checks:
+## 1: tsdist is updated to 0
+## 2: tburnt is equal or bigger than 1
+## 3: Medfire age for vegetations cells is 0
+## 4: Spp after fire is the most abundant saplings (previous dominant tree species with regeneration traits)
+analyse.Medfire.postfire.2 <- function(final.year){
+	check <- 1
+	for (iyear in  2010:final.year){
+	  land.file <- paste("remote_output/", scenario,"/land_", scenario,"_", iyear-1, "_run_1.rdata",sep="")
+	  load(land.file)
+	  prev_land <- land
+		land.file <- paste("remote_output/", scenario,"/land_", scenario,"_", iyear, "_run_1.rdata",sep="")
+		load(land.file)
+		saplings.file <- paste("remote_output/", scenario,"/saplings_", scenario,"_", iyear, "_run_1.rdata",sep="")
+		load(saplings.file)
+		ba.file <- paste("remote_output/", scenario,"/ba_", scenario,"_", iyear, "_run_1.rdata",sep="")
+		load(ba.file)
+
+		
+		burnt.cells <- land$cell.id[(land$tburnt - prev_land$tburnt) == 1 & !is.na(land$tburnt - prev_land$tburnt)]
+		burnt.cells.bcn.IPM <- which(map$Medfire.id %in% burnt.cells)
+
+		cat(paste0("Analysing ", length(burnt.cells.bcn.IPM)," year: ", iyear, "\n"))
+		
+		if (!all(land$age[which(land$spp<=14 & (land$cell.id %in% burnt.cells) & land$distype==6)]==1)){
+			cat(paste0("Model does not update land age ", iyear, "\n"))
+		}
+		
+		for (j in 0:floor((2089-iyear)/10)){
+		    land.file <- paste("remote_output/", scenario,"/land_", scenario,"_", iyear+10*j, "_run_1.rdata",sep="")
+		    load(land.file)
+		    saplings.file <- paste("remote_output/", scenario,"/saplings_", scenario,"_", iyear+10*j, "_run_1.rdata",sep="")
+		    load(saplings.file)
+		    ba.file <- paste("remote_output/", scenario,"/ba_", scenario,"_", iyear+10*j, "_run_1.rdata",sep="")
+		    load(ba.file)
+		    curr_ba <- ba
+		    ba.file <- paste("remote_output/", scenario,"/ba_", scenario,"_", iyear+10*j - 1, "_run_1.rdata",sep="")
+		    load(ba.file)
+		    prev_ba <- ba
+		    ba_tot<-0
+		    sapl_tot<-0
+		    for (i in burnt.cells.bcn.IPM){
+		      if (prev_land$spp[land$cell.id %in% map$Medfire.id[i]])
+		      if (sum(prev_ba[i,])!=0 & sum(curr_ba[i,])!=0){
+		        ba_tot <- ba_tot +1 
+		        if (land$spp[land$cell.id %in% map$Medfire.id[i]] != IPM.index.Medfire.spp[which.max(prev_ba[i,])]){
+		          cat(paste0("Medfire does not track IPM spp cell with ba>0 ", i, " year ", j, " \n"))
+		        }
+		      }
+		      else if (sum(saplings[i,])!=0){
+		        sapl_tot <- sapl_tot +1
+		        if(land$spp[land$cell.id %in% map$Medfire.id[i]] != IPM.index.Medfire.spp[which.max(saplings[i,])])
+		          cat(paste0("Medfire does not track IPM spp cell with saplings>0 ", i, " year ", j, " \n"))
+		      }
+		      else if (land$spp[land$cell.id %in% map$Medfire.id[i]] != 14){
+		        cat(paste0("Medfire does not track IPM spp empty cell ", i, " year ", j, " \n"))
+		      }
+		    }#for burnt cell
+		    #print(paste0("ba tot: ", ba_tot, " sapl tot: ", sapl_tot))
+		}# for future year
+	}#for current year
 }

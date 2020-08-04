@@ -2,14 +2,16 @@
       if(MEDFIRE){
         if(processes[afforest.id] & t %in% temp.afforest.schedule){
             aux  <- afforestation(land, coord, orography, clim, sdm)
-            land$spp[land$cell.id %in% aux$cell.id] <- aux$spp
-            land$age[land$cell.id %in% aux$cell.id] <- 0
-            land$tsdist[land$cell.id %in% aux$cell.id] <- 0
-            land$distype[land$cell.id %in% aux$cell.id] <- afforest
-            clim$spp[clim$cell.id %in% aux$cell.id] <- aux$spp
-            clim$sdm[clim$cell.id %in% aux$cell.id] <- 1
-            clim$sqi[clim$cell.id %in% aux$cell.id] <- aux$sqi
-            track.afforest <- rbind(track.afforest, data.frame(run=irun, year=t, table(aux$spp)))
+            if (length(aux)!=0 & nrow(aux)>0){
+              land$spp[land$cell.id %in% aux$cell.id] <- aux$spp
+              land$age[land$cell.id %in% aux$cell.id] <- 0
+              land$tsdist[land$cell.id %in% aux$cell.id] <- 0
+              land$distype[land$cell.id %in% aux$cell.id] <- afforest
+              clim$spp[clim$cell.id %in% aux$cell.id] <- aux$spp
+              clim$sdm[clim$cell.id %in% aux$cell.id] <- 1
+              clim$sqi[clim$cell.id %in% aux$cell.id] <- aux$sqi
+              track.afforest <- rbind(track.afforest, data.frame(run=irun, year=t, table(aux$spp)))
+            }
             temp.afforest.schedule <- temp.afforest.schedule[-1] 
         }
       }
@@ -50,6 +52,7 @@
                 else if(i %in% deciduous) my.model <- colonization.glm[[3]]
                 suitable$colonized <- predict(my.model,newdata = suitable,type = "response")
                 suitable$colonized <- ifelse(suitable$colonized > colonization.threshold,1,0)
+                suitable<- suitable[suitable$colonized==1,]
                 if (nrow(suitable)>0){
 	                k <- match(suitable$ID,map$ID)
 	                colonized.plots.ID <- c(colonized.plots.ID, map$ID[k])
@@ -66,17 +69,17 @@
           if (MEDFIRE){
             if (processes[afforest.id]){
             	#colonized.medfire <- which(map$Medfire.id %in% aux$cell.id)
-      			#to.colonize.ID <- map$ID[colonized.medfire][!(map$ID[colonized.medfire] %in% colonized.plots.ID )] 
-      			to.colonize.IPM.i <- which(map$Medfire.id %in% aux$cell.id & !(map$ID %in% colonized.plots.ID )) 
-      			if(length(to.colonize.IPM.i)>0){
-      				#k <- match(to.colonize.ID,map$ID)
-      				for(j in to.colonize.IPM.i){
-      					spp.Medfire <- land$spp[land$cell.id==map$Medfire.id[to.colonize.IPM.i[j]]]
-      					spp.IPM <- Medfire.index.IPM.spp[spp.Medfire]
-      					saplings[to.colonize.IPM.i[j], spp.IPM] <- new.saplings[spp.IPM]
-      				}
-      			}
-      		}
+      			  #to.colonize.ID <- map$ID[colonized.medfire][!(map$ID[colonized.medfire] %in% colonized.plots.ID )] 
+        			to.colonize.IPM.i <- which((map$Medfire.id %in% aux$cell.id) & !(map$ID %in% colonized.plots.ID )) 
+        			if(length(to.colonize.IPM.i)>0){
+        				#k <- match(to.colonize.ID,map$ID)
+        				for(j in to.colonize.IPM.i){
+        					spp.Medfire <- land$spp[land$cell.id==map$Medfire.id[j]]
+        					spp.IPM <- Medfire.index.IPM.spp[spp.Medfire]
+        					saplings[j, spp.IPM] <- new.saplings[spp.IPM]
+        				}
+        			}
+      		  }
           } ## if Medfire
         }#if colonization module is active
       }#if IPM
