@@ -40,7 +40,7 @@ land.dyn.mdl <- function(scn.name){
 	  source("./IPM/IPM_functions_v20_old.R")
 	  source("./mdl_interface/build.var.IPM.R")
 	  source("./mdl_interface/read_IPM_age.R")
-	  sourceCpp("./IPM/IPM_functions_v22_1_Year_par.cpp")
+	  sourceCpp("./IPM/IPM_functions_v25_1_Year_par.cpp")
 	  ##IPM global variables and parameters
 	  source("./mdl_interface/IPM_parameters.R")
   }
@@ -177,13 +177,26 @@ land.dyn.mdl <- function(scn.name){
 		 IPM.forest.age <- IPM.forest.age[ini_cells,]
 		 adult.trees<- lapply(adult.trees, function(x) {x[ini_cells,]})
 		 
-		 # NUM_PLOTS <- 2
-		 # target<-c(1,2)
-		 # map <- map[target,]
-		 # ba <- ba[target,]
-		 # saplings <- saplings[target,]
-		 # IPM.forest.age <- IPM.forest.age[target,]
-		 # adult.trees<- lapply(adult.trees, function(x) {x[target,]})
+		 NUM_PLOTS <- 2
+		 target<-c(1,2)
+		 map <- map[target,]
+		 ba <- ba[target,]
+		 saplings <- saplings[target,]
+		 IPM.forest.age <- IPM.forest.age[target,]
+		 adult.trees<- lapply(adult.trees, function(x) {x[target,]})
+	  }
+
+	  if(fill.empty.plots.IPM.from.Medfire & MEDFIRE){
+	  	empty.plots.IPM.index <- which(apply(ba,1,sum)==0)
+	  	for(i in empty.plots.IPM.index){
+	  		Medfire.spp <- land$spp[land$cell.id == map$Medfire.id[i]]
+	  		if (Medfire.spp!=14){
+	  			IPM.spp <- Medfire.index.IPM.spp[Medfire.spp]
+	  			saplings[i,IPM.spp] <- new.saplings[IPM.spp]
+	  			IPM.forest.age[i,IPM.spp]<- 10
+	  		}
+	  	}
+	  	cat("empty plots filled according to MEDFIRE spp\n")
 	  }
 
     
@@ -265,6 +278,22 @@ land.dyn.mdl <- function(scn.name){
       
       ## Track scenario, replicate and time step
       cat(paste0("scn: ", scn.name," - run: ", irun, "/", nrun, " - time: ", t, "/", time.horizon), "\n")
+
+      ## 0. Update land LCT with IPM dominant species at year 2010
+      if(MEDFIRE & IPM.LCT & iyear == 2010) {
+      	for( i in 1:nrow(map)){
+      		if(sum(ba[i,])!=0){
+      			land$spp[land$cell.id == map$Medfire.id[i]] <- IPM.index.Medfire.spp[which.max(ba[i,])]
+      		}
+      		else if(sum(saplings[i,])!=0){
+      			land$spp[land$cell.id == map$Medfire.id[i]] <- IPM.index.Medfire.spp[which.max(saplings[i,])]
+      		}
+      		else{
+      			land$spp[land$cell.id == map$Medfire.id[i]] <- 14
+      		}
+      	}
+        cat("Land spp initialized to be same as IPM dominant spp\n")
+      }
       
       
       ## 1. CLIMATE CHANGE  
@@ -451,7 +480,7 @@ land.dyn.mdl <- function(scn.name){
             for (i in burnt.cells.IPM.index){
               tot.saplings <- sum(saplings[i,])
               for(j in 1:NUM_SP){
-                if (IPM.forest.age[i,j]>9 & fire.regeneration[j] ){  #if species can regenerate
+                if (IPM.forest.age[i,j]>=reg.age[j] & fire.regeneration[j] ){  #if species can regenerate
                   if (sum(ba[i,])>0){
                     ## saplings: fixed number of new.saplings times the abundance proportion of the species in the plot (in ba) 
                     saplings[i,j] <- new.saplings[j]*(ba[i,j]/sum(ba[i,]))
@@ -838,10 +867,12 @@ land.dyn.mdl <- function(scn.name){
         adult.trees.file <- paste0("./mdl_interface/output/",scn.name,"/trees_",scn.name, "_", iyear, "_", "run_",irun, ".rdata")
         ba.file <- paste0("./mdl_interface/output/",scn.name,"/ba_",scn.name, "_", iyear, "_", "run_",irun, ".rdata")
         saplings.file <- paste0("./mdl_interface/output/", scn.name, "/saplings_",scn.name, "_", iyear, "_", "run_",irun, ".rdata")
-        if (iyear%%10==0){save(adult.trees, file=adult.trees.file)}  
+        age.file <- paste0("./mdl_interface/output/", scn.name, "/age_",scn.name, "_", iyear, "_", "run_",irun, ".rdata")
+        if (iyear%%10==0){save(adult.trees, file=adult.trees.file)}
+        #save(adult.trees, file=adult.trees.file)
         save(ba, file=ba.file)
         save(saplings, file=saplings.file)
-        #save(IPM.forest.age, file=IPM.forest.age.file)
+        save(IPM.forest.age, file=age.file)
         }
       }
       if (MEDFIRE){

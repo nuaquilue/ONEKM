@@ -139,6 +139,7 @@ if(COLONIZATION){
 
 ##hard coded fire.regeneration, needs to be changed so it's a file
 fire.regeneration <- c(T,T,T,F,T,F,T,F,F,F,T,T,T,T,T,T)
+reg.age <- c(15,4,4,4,15,15,15,15,15,15,4,4,4,4,4,4)
 
 orig.adult.trees.file <- paste("./IPM/initial_variables/trees_", study.area,"_", n.intervals.mesh, ".rdata",sep="")
 orig.ba.file <- paste("./IPM/initial_variables/ba_", study.area,"_", n.intervals.mesh, ".rdata",sep="")

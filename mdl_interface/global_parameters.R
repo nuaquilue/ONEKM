@@ -2,6 +2,9 @@
 IPM <- T
 MEDFIRE <- T
 
+IPM.LCT <- T
+fill.empty.plots.IPM.from.Medfire <- T
+
 ## Time lenght (in years) of a model simulation, from 2000 to 2100 
 time.horizon <- 90
 
