@@ -186,7 +186,7 @@ land.dyn.mdl <- function(scn.name){
 		 adult.trees<- lapply(adult.trees, function(x) {x[target,]})
 	  }
 
-	  if(fill.empty.plots.IPM.from.Medfire & MEDFIRE){
+	  if(change.IPM.plots.from.Medfire.LCT & MEDFIRE){
 	  	empty.plots.IPM.index <- which(apply(ba,1,sum)==0)
 	  	for(i in empty.plots.IPM.index){
 	  		Medfire.spp <- land$spp[land$cell.id == map$Medfire.id[i]]
@@ -197,6 +197,15 @@ land.dyn.mdl <- function(scn.name){
 	  		}
 	  	}
 	  	cat("empty plots filled according to MEDFIRE spp\n")
+
+	  	tree.plots.to.delete.IPM.index <- which(map$Medfire.id %in% land$cell.id[land$spp==14 & land$cell.id %in% map$Medfire.id])
+  		ba[tree.plots.to.delete.IPM.index,] <- 0
+  		saplings[tree.plots.to.delete.IPM.index,] <- 0
+  		for (s in 1:NUM_SP){
+            adult.trees[[s]][tree.plots.to.delete.IPM.index,]<-0
+          } #for species 
+      IPM.forest.age[tree.plots.to.delete.IPM.index,] <- 0
+      cat("tree plots that are shrub MEDFIRE LCT, destroyed spp\n")
 	  }
 
     
