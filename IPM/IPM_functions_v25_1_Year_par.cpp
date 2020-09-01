@@ -68,7 +68,7 @@ NumericVector IPMprobSurvivalCpp(NumericVector x, NumericVector param){
 //[[Rcpp::export]]
 void my_dlnorm(NumericVector means, NumericVector sds, double h, int nx, NumericMatrix mat){
     int nrow = mat.nrow(), ncol = mat.ncol();
-    #pragma omp parallel num_threads(16)
+    #pragma omp parallel num_threads(12)
     {
     #pragma omp for
     for( int i=0; i<nrow; i++){

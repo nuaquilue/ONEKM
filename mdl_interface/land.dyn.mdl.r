@@ -150,6 +150,8 @@ land.dyn.mdl <- function(scn.name){
 	  	  load(orig.adult.trees.file); load(orig.ba.file); load(orig.saplings.file) 
 	      cat("IPM initial variables loaded\n")
 	  }
+  	num.trees.df <- ba
+  	num.trees.df[,]  <- 0
 
 	  ##IPM plots age
 	  if (file.exists(orig.plots.age.file)){
@@ -186,7 +188,10 @@ land.dyn.mdl <- function(scn.name){
 		 adult.trees<- lapply(adult.trees, function(x) {x[target,]})
 	  }
 
-	  if(change.IPM.plots.from.Medfire.LCT & MEDFIRE){
+	  if(change.IPM.plots.from.Medfire.LCT){
+	    if (!MEDFIRE){ 
+	      load("Medfire/inputlyrs/rdata/land.rdata")
+	    }  
 	  	empty.plots.IPM.index <- which(apply(ba,1,sum)==0)
 	  	for(i in empty.plots.IPM.index){
 	  		Medfire.spp <- land$spp[land$cell.id == map$Medfire.id[i]]
@@ -282,6 +287,7 @@ land.dyn.mdl <- function(scn.name){
     
     
     iyear <- 2000
+    tic()
     ## Start the discrete time sequence 
     for(t in time.seq){
       
@@ -852,11 +858,13 @@ land.dyn.mdl <- function(scn.name){
               if(num.trees < 0.1){
                 adult.trees[[j]][i,] <- 0
                 ba[i,j] <- 0
+                num.trees.df[i,j] <-0
                 if (saplings[i,j]>0){
                   IPM.forest.age[i,j] <- IPM.forest.age[i,j] + 1 
                 }
               }else{
                 ba[i,j] <- quadTrapezCpp_1(dummy*x2[,j],h[j],nx)*pi
+                num.trees.df[i,j] <- num.trees
                 IPM.forest.age[i,j] <- IPM.forest.age[i,j] + 1 
               }
 
@@ -877,11 +885,13 @@ land.dyn.mdl <- function(scn.name){
         ba.file <- paste0("./mdl_interface/output/",scn.name,"/ba_",scn.name, "_", iyear, "_", "run_",irun, ".rdata")
         saplings.file <- paste0("./mdl_interface/output/", scn.name, "/saplings_",scn.name, "_", iyear, "_", "run_",irun, ".rdata")
         age.file <- paste0("./mdl_interface/output/", scn.name, "/age_",scn.name, "_", iyear, "_", "run_",irun, ".rdata")
+        num.trees.file <- paste0("./mdl_interface/output/", scn.name, "/num_trees_",scn.name, "_", iyear, "_", "run_",irun, ".rdata")
         if (iyear%%10==0){save(adult.trees, file=adult.trees.file)}
         #save(adult.trees, file=adult.trees.file)
         save(ba, file=ba.file)
         save(saplings, file=saplings.file)
         save(IPM.forest.age, file=age.file)
+        save(num.trees.df, file=num.trees.file)
         }
       }
       if (MEDFIRE){
@@ -909,7 +919,7 @@ land.dyn.mdl <- function(scn.name){
       cat("\n")
       
     } # time
-    
+    toc()
     if(MEDFIRE){
       # Print maps at the end of the simulation period per each run
       if(write.sp.outputs){

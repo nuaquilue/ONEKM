@@ -20,7 +20,7 @@ spain <- rgdal::readOGR(dsn="./IPM",layer="bcn_UTM_v1")
 spain.df <- fortify(spain)
 
 ## what do we want to store?
-save.IPM.variables <- T
+save.IPM.variables <- F
 store.original.dbh.dist <- F 
 store.original.abundances <- F 
 store.decadal.dbh.dist <- F
@@ -109,7 +109,7 @@ if(file.exists("./mdl_interface/params_IPM.rdata")){
 
 ## Colonization parameters
 ingrowth <- T
-COLONIZATION <- T ##do we want colonization?
+COLONIZATION <- F ##do we want colonization?
 max.dist <- 1500 ##meters
 colonization.threshold <- 0.05
 BASAL.AREA.THRESHOLD <- T
@@ -132,6 +132,7 @@ new.saplings <- c(297.9471,
                   309.4185,
                   242.8038,
                   502.7275)
+new.saplings <- new.saplings*25*pi/10000
 if(COLONIZATION){
   load("./IPM/regresiones/colonization_v3")
   load("./IPM/distancias_hasta_2236_v2")

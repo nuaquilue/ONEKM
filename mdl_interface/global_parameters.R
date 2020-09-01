@@ -1,9 +1,9 @@
 ##IPM-Medfire global variables
 IPM <- T
-MEDFIRE <- T
+MEDFIRE <- F
 
-IPM.LCT <- T
-change.IPM.plots.from.Medfire.LCT <- T
+IPM.LCT <- F
+change.IPM.plots.from.Medfire.LCT <- F
 
 ## Time lenght (in years) of a model simulation, from 2000 to 2100 
 time.horizon <- 90
@@ -12,7 +12,7 @@ clim.scn <- "rcp45"
 clim.mdl <- "SMHI-RCA4_MOHC-HadGEM2-ES"
 
 nrun <- 1
-testing <- F
+testing <- T
 # work.path <- "C:/Users/uriso/Desktop/ONEKM" #Laptop oriol
 #work.path <- "C:/Users/Administrator/Oriol/ONEKM" #remote brotons lab
 work.path <- "/home/xrdpuser/Desktop/ONEKM"

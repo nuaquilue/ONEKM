@@ -980,7 +980,7 @@ GetSuitablePlots <- function(map,
   } else {
     suitable <- NULL
   }# if > 1
-  suitable <- subset(suitable,neigh_ba > 0)
+  suitable <- subset(suitable,neigh_ba > 20)
   return (suitable)
 }
 
