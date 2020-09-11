@@ -20,7 +20,7 @@ ini_land <- land
 fire.regeneration <- c(T,T,T,F,T,F,T,F,F,F,T,T,T,T,T,T)
 Medfire.index.IPM.spp<-c(5,6,8,9,7,10,2,12,15,11,11,3,1) #quercus humilis and faginea are classified as the same for IPM
 IPM.index.Medfire.spp <-c(13,13,12,13,1,2,5,3,4,6,11,8,13,13,9,13)
-scenario <- "test_coupled_rem_6"
+scenario <- "coupled_scn_1_run_2"
 ##Test function to assess if for all burnt cells in Medfire within IPM study area
 ##The cells of IPM are also burnt
 analyse.burnt.IPM.cells <- function(final.year){
